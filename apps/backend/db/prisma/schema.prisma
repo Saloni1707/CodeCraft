@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User{
+    id        String    @id    @default(uuid())
+    email     String    @unique
+    password  String 
+    role      Role    @default(User) 
+    leaderboard LeaderBoard[]
+    submissions Submission[]
+}
+
+enum Role{
+  User
+  Admin
+}
+
+model Contest{
+  id              String    @id   @default(uuid())
+  title           String
+  startTime       DateTime
+  contestToChallengeMapping ContestToChallengeMapping[]
+  leaderboard LeaderBoard[]
+}
+
+model ContestToChallengeMapping{
+  id             String    @id    @default(uuid())
+  contestId      String
+  challengeId    String
+  index          Int
+  contests       Contest   @relation(fields:[contestId],references:[id])
+  challenge     Challenge @relation(fields:[challengeId],references:[id])
+  @@unique([contestId,challengeId])
+  
+  submissions Submission[]
+}
+
+model Challenge{
+  id            String    @id    @default(uuid())
+  title         String
+  notionDocId   String
+  contestId     String
+  maxPoints     Int
+  contestToChallengeMapping ContestToChallengeMapping[]
+}
+
+model Submission{
+  id                           String    @id    @default(uuid())
+  submissions                  String
+  userId                       String
+  user                         User             @relation(fields:[userId],references:[id])
+  contestToChallengeMappingId  String
+  contestToChallengeMapping    ContestToChallengeMapping @relation(fields:[contestToChallengeMappingId],references:[id])
+  points                       Int
+  createdAt                    DateTime  @default(now())
+}
+
+
+model LeaderBoard{
+  id            String    @id    @default(uuid())
+  contestId     String
+  userId        String
+  rank          Int
+  contest       Contest   @relation(fields:[contestId],references:[id])
+  user          User      @relation(fields:[userId],references:[id])
+  @@unique([contestId,rank])
+}
