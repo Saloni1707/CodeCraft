@@ -15,7 +15,7 @@ router.get("/:contestId",(req,res)=>{
     const contestId = req.params.contestId;
 
 })
-router.get(":/contestId/:challengeId",(req,res) => {
+router.get(":contestId/:challengeId",(req,res) => {
     //@ts-ignore
     const contestId = req.params.contestId;
 })
