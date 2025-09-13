@@ -4,6 +4,7 @@ import adminRouter from "./routes/admin";
 import contestRouter from "./routes/contest";
 import dotenv from "dotenv";
 import prisma from "./lib/client";
+
 dotenv.config();
 
 const app = express();
