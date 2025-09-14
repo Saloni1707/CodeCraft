@@ -1,6 +1,5 @@
-// lib/otpService.ts
+// lib/otpService.ts - Alternative with fetch API
 import { createClient, RedisClientType } from 'redis';
-import * as SibApiV3Sdk from 'sib-api-v3-sdk';
 import { randomInt } from 'crypto';
 
 interface RedisConfig {
@@ -40,154 +39,194 @@ interface OTPStatus {
     attemptsRemaining: number;
 }
 
-interface EmailRecipient {
-    email: string;
-    name: string;
-}
-
-interface EmailSender {
-    name: string;
-    email: string;
-}
-
 class OTPService {
     private redisClient: RedisClientType;
-    private transactionalEmailsApi: SibApiV3Sdk.TransactionalEmailsApi;
+    private brevoApiKey: string;
     private config: OTPConfig;
+    private senderEmail: string;
+    private senderName: string;
 
     constructor(brevoApiKey: string, redisConfig: RedisConfig = {}) {
-        const redisUrl = redisConfig.url || process.env.REDIS_URL || "";
-        const isTLS = redisUrl.startsWith("rediss://");
+        if (!brevoApiKey) {
+            throw new Error('Brevo API key is required');
+        }
 
-        // Initialize Redis client with auto TLS detection
+        this.brevoApiKey = brevoApiKey;
+
         this.redisClient = createClient({
-            url: redisUrl,
+            url: redisConfig.url || process.env.REDIS_URL,
             socket: {
-                tls: isTLS,
-                rejectUnauthorized: isTLS ? true : undefined,
-                ...redisConfig.socket
+                tls: redisConfig.socket?.tls !== false,
+                rejectUnauthorized: redisConfig.socket?.rejectUnauthorized || false
             },
             ...redisConfig
         });
-
+        
         this.redisClient.on('error', (err: Error) => {
             console.error('Redis Client Error:', err);
         });
 
         this.redisClient.on('connect', () => {
-            console.log('Connected to Redis');
+            console.log('✅ Connected to Redis');
         });
 
-        // Initialize Brevo API
-        const defaultClient = SibApiV3Sdk.ApiClient.instance;
-        const apiKey = defaultClient.authentications['api-key'];
-        apiKey.apiKey = brevoApiKey;
+        this.redisClient.on('disconnect', () => {
+            console.log('Disconnected from Redis');
+        });
 
-        this.transactionalEmailsApi = new SibApiV3Sdk.TransactionalEmailsApi();
+        this.senderEmail = process.env.SENDER_EMAIL || "noreply@yourapp.com";
+        this.senderName = process.env.SENDER_NAME || "Your App";
+        
+        if (!process.env.SENDER_EMAIL) {
+            console.warn('⚠️  SENDER_EMAIL not set, using default:', this.senderEmail);
+        }
 
-        // Default OTP config
         this.config = {
             otpLength: 6,
-            otpExpiry: 300, // 5 minutes
+            otpExpiry: 300,
             maxAttempts: 5,
-            rateLimitWindow: 3600, // 1 hour
+            rateLimitWindow: 3600,
             maxRequestsPerHour: 5
         };
+
+        console.log('✅ OTP Service initialized successfully');
     }
 
     async connect(): Promise<void> {
-        await this.redisClient.connect();
+        if (!this.redisClient.isOpen) {
+            await this.redisClient.connect();
+        }
     }
 
     async disconnect(): Promise<void> {
-        await this.redisClient.disconnect();
+        if (this.redisClient.isOpen) {
+            await this.redisClient.disconnect();
+        }
     }
 
-    // Generate secure OTP
+    private async ensureConnection(): Promise<void> {
+        if (!this.redisClient.isOpen) {
+            await this.connect();
+        }
+    }
+
     private generateOTP(length: number = this.config.otpLength): string {
         const digits = '0123456789';
         let otp = '';
+        
         for (let i = 0; i < length; i++) {
             const randomIndex = randomInt(0, digits.length);
             otp += digits[randomIndex];
         }
+        
         return otp;
     }
 
-    // Check rate limiting (atomic)
-    private async checkRateLimit(email: string): Promise<boolean> {
+    private async checkAndUpdateRateLimit(email: string): Promise<boolean> {
+        await this.ensureConnection();
+        
         const rateLimitKey = `rate_limit:${email}`;
-        const currentCount = await this.redisClient.get(rateLimitKey);
-        return !(
-            currentCount &&
-            parseInt(currentCount) >= this.config.maxRequestsPerHour
-        );
-    }
-
-    // Update rate limit counter (atomic)
-    private async updateRateLimit(email: string): Promise<void> {
-        const rateLimitKey = `rate_limit:${email}`;
-
-        const result = await this.redisClient.multi()
-            .incr(rateLimitKey)
-            .expire(rateLimitKey, this.config.rateLimitWindow)
-            .exec();
-
-        if (!result) {
-            throw new Error("Failed to update rate limit");
+        
+        try {
+            const multi = this.redisClient.multi();
+            
+            const currentCount = await this.redisClient.get(rateLimitKey);
+            
+            if (currentCount) {
+                const count = parseInt(currentCount);
+                if (count >= this.config.maxRequestsPerHour) {
+                    return false;
+                }
+                multi.incr(rateLimitKey);
+            } else {
+                multi.setEx(rateLimitKey, this.config.rateLimitWindow, '1');
+            }
+            
+            await multi.exec();
+            return true;
+            
+        } catch (error) {
+            console.error('Rate limit check error:', error);
+            throw new Error('Rate limit check failed');
         }
     }
 
-    // Send OTP
+    private async sendBrevoEmail(email: string, otp: string, purpose: string): Promise<any> {
+        const emailData = {
+            to: [{
+                email: email,
+                name: email.split('@')[0]
+            }],
+            subject: `Your OTP for ${purpose}`,
+            htmlContent: this.generateOTPEmailHTML(otp, purpose),
+            textContent: this.generateOTPEmailText(otp, purpose),
+            sender: {
+                name: this.senderName,
+                email: this.senderEmail
+            }
+        };
+
+        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'api-key': this.brevoApiKey
+            },
+            body: JSON.stringify(emailData)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(`Brevo API error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`);
+        }
+
+        return await response.json();
+    }
+
     async sendOTP(email: string, purpose: string = 'verification'): Promise<SendOTPResult> {
         try {
-            const canSend = await this.checkRateLimit(email);
+            if (!this.isValidEmail(email)) {
+                throw new Error('Invalid email format');
+            }
+
+            const canSend = await this.checkAndUpdateRateLimit(email);
             if (!canSend) {
                 throw new Error('Rate limit exceeded. Too many OTP requests.');
             }
-
+            
             const otp = this.generateOTP();
             const otpKey = `otp:${email}`;
             const attemptsKey = `attempts:${email}`;
 
+            await this.ensureConnection();
+
             await this.redisClient.setEx(otpKey, this.config.otpExpiry, otp);
             await this.redisClient.setEx(attemptsKey, this.config.otpExpiry, '0');
 
-            const sendSmtpEmail: SibApiV3Sdk.SendSmtpEmail = {
-                to: [{
-                    email: email,
-                    name: email.split('@')[0]
-                }] as EmailRecipient[],
-                subject: `Your OTP for ${purpose}`,
-                htmlContent: this.generateOTPEmailHTML(otp, purpose),
-                textContent: this.generateOTPEmailText(otp, purpose),
-                sender: {
-                    name: process.env.SENDER_NAME || "Your App",
-                    email: process.env.SENDER_EMAIL || "noreply@yourapp.com"
-                } as EmailSender
-            };
-
-            const result = await this.transactionalEmailsApi.sendTransacEmail(sendSmtpEmail);
-
-            await this.updateRateLimit(email);
+            console.log('📧 Sending OTP email to:', email);
+            const result = await this.sendBrevoEmail(email, otp, purpose);
+            console.log('✅ OTP email sent successfully');
 
             return {
                 success: true,
                 message: 'OTP sent successfully',
-                messageId: (result as any).messageId, // SDK typing quirk
+                messageId: result.messageId || undefined,
                 expiresIn: this.config.otpExpiry
             };
 
         } catch (error) {
-            console.error('Error sending OTP:', error);
+            console.error('❌ Error sending OTP:', error);
+            
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
             throw new Error(`Failed to send OTP: ${errorMessage}`);
         }
     }
 
-    // Verify OTP
     async verifyOTP(email: string, inputOTP: string | number): Promise<VerifyOTPResult> {
         try {
+            await this.ensureConnection();
+            
             const otpKey = `otp:${email}`;
             const attemptsKey = `attempts:${email}`;
 
@@ -206,9 +245,14 @@ class OTPService {
             if (storedOTP === inputOTP.toString()) {
                 await this.redisClient.del(otpKey);
                 await this.redisClient.del(attemptsKey);
-                return { success: true, message: 'OTP verified successfully' };
+                
+                return {
+                    success: true,
+                    message: 'OTP verified successfully'
+                };
             } else {
                 await this.redisClient.incr(attemptsKey);
+                
                 return {
                     success: false,
                     message: 'Invalid OTP',
@@ -222,20 +266,40 @@ class OTPService {
         }
     }
 
-    // Email templates
+    private isValidEmail(email: string): boolean {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
     private generateOTPEmailHTML(otp: string, purpose: string): string {
         return `
             <!DOCTYPE html>
             <html>
             <head>
                 <meta charset="utf-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Your OTP Code</title>
                 <style>
-                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
                     .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                    .otp-box { background: #f8f9fa; border: 2px solid #007bff; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0; }
-                    .otp-code { font-size: 32px; font-weight: bold; color: #007bff; letter-spacing: 5px; margin: 10px 0; }
+                    .otp-box { 
+                        background: #f8f9fa; 
+                        border: 2px solid #007bff; 
+                        border-radius: 8px; 
+                        padding: 20px; 
+                        text-align: center; 
+                        margin: 20px 0; 
+                    }
+                    .otp-code { 
+                        font-size: 32px; 
+                        font-weight: bold; 
+                        color: #007bff; 
+                        letter-spacing: 5px; 
+                        margin: 10px 0; 
+                        font-family: monospace;
+                    }
                     .warning { color: #dc3545; font-size: 14px; margin-top: 15px; }
+                    .expiry { color: #6c757d; font-size: 14px; }
                 </style>
             </head>
             <body>
@@ -245,7 +309,7 @@ class OTPService {
                     
                     <div class="otp-box">
                         <div class="otp-code">${otp}</div>
-                        <p>This code will expire in ${Math.floor(this.config.otpExpiry / 60)} minutes.</p>
+                        <p class="expiry">This code will expire in ${Math.floor(this.config.otpExpiry / 60)} minutes.</p>
                     </div>
                     
                     <p class="warning">
@@ -270,8 +334,9 @@ Security Notice: Never share this code with anyone. If you didn't request this c
         `.trim();
     }
 
-    // Debug method
     async getOTPStatus(email: string): Promise<OTPStatus> {
+        await this.ensureConnection();
+        
         const otpKey = `otp:${email}`;
         const attemptsKey = `attempts:${email}`;
         
@@ -287,26 +352,8 @@ Security Notice: Never share this code with anyone. If you didn't request this c
     }
 
     async cleanup(): Promise<void> {
-        console.log('OTP cleanup completed (Redis TTL handles expiration)');
+        console.log('OTP cleanup completed (Redis handles TTL automatically)');
     }
 }
 
 export default OTPService;
-
-// Example usage
-async function example(): Promise<void> {
-    const otpService = new OTPService(
-        process.env.BREVO_API_KEY || 'your-brevo-api-key',
-        { url: process.env.REDIS_URL }
-    );
-
-    try {
-        await otpService.connect();
-        const sendResult = await otpService.sendOTP('user@example.com', 'account verification');
-        console.log('OTP sent:', sendResult);
-    } catch (error) {
-        console.error('Error:', error instanceof Error ? error.message : 'Unknown error');
-    } finally {
-        await otpService.disconnect();
-    }
-}
