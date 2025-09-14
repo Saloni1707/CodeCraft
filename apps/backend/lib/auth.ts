@@ -10,7 +10,7 @@ export async function comparePassword(password:string,hashPassword:string){
     return await bcrypt.compare(password,hashPassword);
 }
 
-export async function generateToken(payload:any) { //tokens are stateless
+export async function generateToken(payload: any) { //tokens are stateless
     const secret = process.env.JWT_SECRET;
     if(!secret){
         throw new Error("JWT_SECRET is not defined");

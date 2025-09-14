@@ -3,6 +3,8 @@ import rateLimit from 'express-rate-limit';
 import { z } from 'zod';
 import OTPService from "../lib/otpStore";
 import dotenv from "dotenv";
+import prisma from "../lib/client";
+import {hashPassword,comparePassword,generateToken} from "../lib/auth";
 dotenv.config();
 
 const router = Router();
@@ -39,15 +41,60 @@ try {
     console.error('Failed to initialize OTP service:', error);
     process.exit(1);
 }
+const signupSchema=z.object({
+    email:z.string().email("Invalid email"),
+    password:z.string().min(4,"Password must be at least 4 characters")    
+})
 
-router.post("/signup", (req, res) => {
-    // TODO: Implement signup logic
-    res.json({ message: "Signup endpoint - not implemented yet" });
+router.post("/signup", async(req, res) => {
+    try{
+        const{email,password}=signupSchema.parse(req.body);
+        const existingUser=await prisma.user.findUnique({where:{email}})
+        if(existingUser){
+            return res.status(400).json({success:false,message:"User already exists"})
+        }
+        const hashedPassword=await hashPassword(password);
+        const user = await prisma.user.create({
+            data:{
+                email,
+                password:hashedPassword
+            }
+        });
+        res.status(201).json({success:true,message:"User created successfully",user})
+    }catch(error){
+        if(error instanceof z.ZodError){
+            return res.status(400).json({success:false,errors:error.errors})
+        }
+        console.error(error);
+        res.status(500).json({success:false,message:"Internal server error"})
+    }
 });
+const signinSchema=z.object({
+    email:z.string().email("Invalid email"),
+    password:z.string().min(4,"Password must be at least 4 characters")    
+})
 
-router.post("/signin", (req, res) => {
-    // TODO: Implement signin logic
-    res.json({ message: "Signin endpoint - not implemented yet" });
+router.post("/signin",async (req, res) => {
+    try{
+        const{email,password}=signinSchema.parse(req.body);
+        const user=await prisma.user.findUnique({where:{email}});
+        if(!user){
+            return res.status(400).json({success:false,message:"Invalid credentials"})
+        }
+        const isMatch=await comparePassword(password,user.password);
+        if(!isMatch){
+            return res.status(400).json({success:false,message:"Invalid credentials"})
+        }
+        const token=generateToken(user.id,user.role);
+        res.status(200).json({success:true,message:"User signed in successfully",token})
+
+    }catch(error){
+        if(error instanceof z.ZodError){
+            return res.status(400).json({success:false,errors:error.errors})
+        }
+        console.error(error);
+        res.status(500).json({success:false,message:"Internal server error"})
+    }
 });
 
 router.post('/send-otp', otpRateLimiting, async (req, res) => {
