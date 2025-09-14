@@ -1,23 +1,9 @@
-// Load environment variables FIRST - before any other imports
-import dotenv from "dotenv";
-dotenv.config();
-
-// Now import everything else
 import express from "express";
 import userRouter from "./routes/user";
 import adminRouter from "./routes/admin";
 import contestRouter from "./routes/contest";
 import prisma from "./lib/client";
 
-// Add this debugging section - remove after confirming it works
-console.log('🔧 Environment Variables Check:');
-console.log('PORT:', process.env.PORT || 'Not set (using default 4000)');
-console.log('DATABASE_URL:', process.env.DATABASE_URL ? 'Set' : 'Missing');
-console.log('BREVO_API_KEY:', process.env.BREVO_API_KEY ? 'Set' : 'Missing');
-console.log('REDIS_URL:', process.env.REDIS_URL ? 'Set' : 'Missing');
-console.log('SENDER_EMAIL:', process.env.SENDER_EMAIL || 'Missing');
-console.log('SENDER_NAME:', process.env.SENDER_NAME || 'Missing');
-console.log('---');
 
 const app = express();
 

@@ -5,6 +5,7 @@ import OTPService from "../lib/otpStore";
 import dotenv from "dotenv";
 import prisma from "../lib/client";
 import {hashPassword,comparePassword,generateToken} from "../lib/auth";
+import authenticateToken, { authorizeRole } from "../middleware/authMiddleware";
 dotenv.config();
 
 const router = Router();
@@ -85,8 +86,8 @@ router.post("/signin",async (req, res) => {
         if(!isMatch){
             return res.status(400).json({success:false,message:"Invalid credentials"})
         }
-        const token=generateToken(user.id,user.role);
-        res.status(200).json({success:true,message:"User signed in successfully",token})
+        const token=await generateToken({id:user.id,role:user.role});
+        res.status(200).json({success:true,message:"User signed in successfully",user:{id:user.id,email:user.email,role:user.role},token})
 
     }catch(error){
         if(error instanceof z.ZodError){
@@ -96,6 +97,18 @@ router.post("/signin",async (req, res) => {
         res.status(500).json({success:false,message:"Internal server error"})
     }
 });
+
+router.get("/profile",authenticateToken,async(req,res)=>{
+    const user=(req as any).user;
+    res.json({success:true,user});
+});
+
+router.get("/admin/dashboard", 
+    authenticateToken, 
+    authorizeRole("Admin"), 
+    (req, res) => {
+      res.json({ success: true, message: "Welcome Admin!" });
+  });
 
 router.post('/send-otp', otpRateLimiting, async (req, res) => {
     try {
