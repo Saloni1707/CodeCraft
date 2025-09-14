@@ -22,13 +22,11 @@ const verifyOTPSchema = z.object({
     otp: z.string().min(6, 'OTP must be 6 digits')
 });
 
-// Initialize OTP service - make sure env vars are loaded
 let otpService: OTPService;
 try {
     if (!process.env.BREVO_API_KEY) {
         throw new Error('BREVO_API_KEY environment variable is required');
     }
-    // otpService = new OTPService(process.env.BREVO_API_KEY);
     otpService = new OTPService(process.env.BREVO_API_KEY, {
         url: process.env.REDIS_URL || 'redis://localhost:6379',
         socket: {
@@ -75,7 +73,6 @@ router.post('/send-otp', otpRateLimiting, async (req, res) => {
 router.post('/verify-otp', async (req, res) => {
     try {
         const { email, otp } = verifyOTPSchema.parse(req.body);
-        // Fix: Use the existing otpService instance, not create a new one
         const result = await otpService.verifyOTP(email, otp);
         res.json(result);
     } catch (error) {
