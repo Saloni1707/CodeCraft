@@ -4,7 +4,6 @@ import {z} from "zod";
 import prisma from "../lib/client";
 import { authenticateToken, authorizeRole } from "../middleware/authMiddleware";
 const router=Router();
-router.use(authenticateToken,authorizeRole("Admin"));
 
 router.post("/signup",async (req,res) =>{
     try{
@@ -53,11 +52,11 @@ router.post("/signin",async (req,res)=>{
         return res.status(500).json({success:false,message:"Internal server error"})
     }
 })
+router.use(authenticateToken,authorizeRole("Admin"));
 
-//create a contest
 const createContestSchema = z.object({
     title:z.string().min(1),
-    startTime:z.date(),
+    startTime:z.string().transform((value)=>new Date(value)),
 })
 router.post("/contest",async (req,res)=>{
     try{
@@ -65,18 +64,29 @@ router.post("/contest",async (req,res)=>{
         const contest = await prisma.contest.create({
             data:{
                 title,
-                startTime:new Date(startTime)
+                startTime
             }
         });
-        return res.status(200).json({success:true,message:"Contest created successfully",contest});
+        return res.status(200).json({
+            success:true,
+            message:"Contest created successfully",
+            contest
+        });
     }catch(err){
         if(err instanceof z.ZodError){
-            return res.status(400).json({success:false,message:"Invalid request",errors:err.errors});
+            return res.status(400).json({
+                success:false,
+                message:"Invalid request",
+                errors:err.errors
+            });
         }
         console.error(err);
-        return res.status(500).json({success:false,message:"Internal server error"});
+        return res.status(500).json({
+            success:false,
+            message:"Internal server error"
+        });
     }
-})
+});
 
 const addChallengeSchema=z.object({
     title:z.string().min(1),
@@ -90,7 +100,10 @@ router.post("/contest/:contestId/challenge",async (req,res) => {
         const {title,notionDocId,maxPoints}=addChallengeSchema.parse(req.body);
         const contest = await prisma.contest.findUnique({where:{id:contestId}});
         if(!contest){
-            return res.status(401).json({success:false,message:"Contest not found"})
+            return res.status(401).json({
+                success:false,
+                message:"Contest not found"
+            })
         }
         const challenge=await prisma.challenge.create({
             data:{

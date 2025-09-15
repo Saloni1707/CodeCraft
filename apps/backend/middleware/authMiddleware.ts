@@ -18,7 +18,7 @@ export function authenticateToken(req:Request,res:Response,next:NextFunction){
     }
     try{
         const decoded = jwt.verify(token,secret) as JwtPayload;
-        return (req as any).user = decoded;
+        (req as any).user = decoded;
         next();
     }catch(e){
         return res.status(403).json({success:false,message:"Invalid token"})
@@ -31,6 +31,6 @@ export function authorizeRole(RequiredRole:string){
         if(user.role !== RequiredRole){
             return res.status(403).json({success:false,message:"Unauthorized"})
         }
-        return next();
+        next();
     };
 }
