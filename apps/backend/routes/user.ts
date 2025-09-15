@@ -5,7 +5,7 @@ import OTPService from "../lib/otpStore";
 import dotenv from "dotenv";
 import prisma from "../lib/client";
 import {hashPassword,comparePassword,generateToken} from "../lib/auth";
-import authenticateToken, { authorizeRole } from "../middleware/authMiddleware";
+import {authenticateToken, authorizeRole } from "../middleware/authMiddleware";
 dotenv.config();
 
 const router = Router();
@@ -61,13 +61,13 @@ router.post("/signup", async(req, res) => {
                 password:hashedPassword
             }
         });
-        res.status(201).json({success:true,message:"User created successfully",user})
+        return res.status(201).json({success:true,message:"User created successfully",user})
     }catch(error){
         if(error instanceof z.ZodError){
             return res.status(400).json({success:false,errors:error.errors})
         }
         console.error(error);
-        res.status(500).json({success:false,message:"Internal server error"})
+        return res.status(500).json({success:false,message:"Internal server error"})
     }
 });
 const signinSchema=z.object({
@@ -87,14 +87,14 @@ router.post("/signin",async (req, res) => {
             return res.status(400).json({success:false,message:"Invalid credentials"})
         }
         const token=await generateToken({id:user.id,role:user.role});
-        res.status(200).json({success:true,message:"User signed in successfully",user:{id:user.id,email:user.email,role:user.role},token})
+        return res.status(200).json({success:true,message:"User signed in successfully",user:{id:user.id,email:user.email,role:user.role},token})
 
     }catch(error){
         if(error instanceof z.ZodError){
             return res.status(400).json({success:false,errors:error.errors})
         }
         console.error(error);
-        res.status(500).json({success:false,message:"Internal server error"})
+        return res.status(500).json({success:false,message:"Internal server error"})
     }
 });
 
@@ -114,7 +114,7 @@ router.post('/send-otp', otpRateLimiting, async (req, res) => {
     try {
         const { email } = sendOTPSchema.parse(req.body);
         const result = await otpService.sendOTP(email);
-        res.json(result);
+        return res.json(result);
     } catch (error) {
         if (error instanceof z.ZodError) {
             return res.status(400).json({
@@ -123,7 +123,7 @@ router.post('/send-otp', otpRateLimiting, async (req, res) => {
             });
         }
         const message = error instanceof Error ? error.message : 'Unknown error';
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message
         });
@@ -134,7 +134,7 @@ router.post('/verify-otp', async (req, res) => {
     try {
         const { email, otp } = verifyOTPSchema.parse(req.body);
         const result = await otpService.verifyOTP(email, otp);
-        res.json(result);
+        return res.json(result);
     } catch (error) {
         if (error instanceof z.ZodError) {
             return res.status(400).json({
@@ -143,7 +143,7 @@ router.post('/verify-otp', async (req, res) => {
             });
         }
         const message = error instanceof Error ? error.message : 'Unknown error';
-        res.status(500).json({ 
+        return res.status(500).json({ 
             success: false, 
             message 
         });

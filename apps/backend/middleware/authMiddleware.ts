@@ -6,7 +6,7 @@ interface JwtPayload{
     role:string;
 }
 
-export default function authenticateToken(req:Request,res:Response,next:NextFunction){
+export function authenticateToken(req:Request,res:Response,next:NextFunction){
     const authHeader = req.headers.authorization;
     const token = authHeader;
     if(!token){
@@ -18,7 +18,7 @@ export default function authenticateToken(req:Request,res:Response,next:NextFunc
     }
     try{
         const decoded = jwt.verify(token,secret) as JwtPayload;
-        (req as any).user = decoded;
+        return (req as any).user = decoded;
         next();
     }catch(e){
         return res.status(403).json({success:false,message:"Invalid token"})
@@ -31,6 +31,6 @@ export function authorizeRole(RequiredRole:string){
         if(user.role !== RequiredRole){
             return res.status(403).json({success:false,message:"Unauthorized"})
         }
-        next();
+        return next();
     };
 }
