@@ -150,4 +150,83 @@ router.post('/verify-otp', async (req, res) => {
     }
 });
 
+router.get("/challenges",async(req,res)=>{
+    try{
+        const challenges=await prisma.challenge.findMany({
+            include:{
+                contestToChallengeMapping:{
+                    include:{
+                        contests:true,
+                    }
+                }
+            }
+        });
+        return res.status(200).json({success:true,challenges});
+    }catch(err){
+        console.log(err);
+        return res.status(500).json({success:false,message:"Internal server error"});
+    }
+});
+//we get here the single challenge
+router.get("/challenges/:challengeId",async(req,res)=>{
+    try{
+        const{challengeId}=req.params;
+        const challenge=await prisma.challenge.findUnique({
+            where:{id:challengeId},
+            include:{
+                contestToChallengeMapping:{
+                    include:{
+                        contests:true,
+                    }
+
+                }
+            }
+        });
+        if(!challenge){
+            return res.status(404).json({success:false,message:"Challenge not found"})
+        }
+        const now=new Date();
+        const contest = challenge.contestToChallengeMapping[0]?.contests;
+        if(!contest){
+            return res.status(404).json({success:false,message:"Contest not found"});
+        }
+        if(contest.startTime>now){
+            return res.status(404).json({success:false,message:"Contest not started yet"});
+        }
+        return res.status(200).json({success:true,challenge});
+    }catch(err){
+        console.log(err);
+        return res.status(500).json({success:false,message:"Internal server error"});
+    }
+})
+
+router.post("/challenges/:challengeId/submit",authenticateToken,async(req,res) =>{
+    try{
+        const{ id }=req.params;
+        const {submissions}=req.body;
+        
+        const user=(req as any).user;
+        const mapping = await prisma.contestToChallengeMapping.findFirst({
+            where:{
+                challengeId:id
+            }
+        })
+        if(!mapping){
+            return res.status(400).json({success:false,message:"Challenge not found"});
+        }
+        const submission=await prisma.submission.create({
+            data:{
+                userId:user.id,
+                submissions,
+                contestToChallengeMappingId:mapping.id,
+                points:0,
+            }
+        });
+        return res.status(200).json({success:true,submission});
+    }catch(err){
+        console.error(err);
+        return res.status(500).json({success:false,message:"Internal server error"});
+    }
+});
+
 export default router;
