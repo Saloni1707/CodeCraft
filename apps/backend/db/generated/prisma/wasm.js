@@ -161,7 +161,7 @@ exports.Prisma.LeaderBoardScalarFieldEnum = {
   id: 'id',
   contestId: 'contestId',
   userId: 'userId',
-  rank: 'rank'
+  score: 'score'
 };
 
 exports.Prisma.SortOrder = {

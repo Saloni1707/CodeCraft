@@ -1,7 +1,14 @@
 import {Router} from "express";
 import prisma from "../lib/client";
 import {authenticateToken} from "../middleware/authMiddleware";
+import {evaluateSubmission,updateLeaderboard} from "../lib/scoringService";
+import { createClient } from "redis";
 const router=Router();
+
+const redis=createClient({
+    url:process.env.REDIS_URL
+});
+redis.connect().catch(console.error);
 
 router.get("/active",async(req,res)=>{
     try{
@@ -132,9 +139,57 @@ router.get("/:contestId/challenges/:challengeId",async(req,res)=>{
     }
 })
 
-router.get("/leaderboard/:contestId",async(req,res)=>{
-    //we read article here for leaderboard scaling
+router.post("/submit/:challengeId",authenticateToken,async(req,res)=>{
+    try{
+        const {challengeId}=req.params;
+        const {submissions}=req.body;
+        const user = (req as any).user;
 
+        const mapping=await prisma.contestToChallengeMapping.findFirst({
+            where:{challengeId},
+            include:{contests:true,challenge:true}
+        });
+        if(!mapping){
+            return res.status(404).json({
+                success:false,
+                message:"Challenge not found"
+            })
+        }
+        if(mapping.contests.startTime>new Date()){
+            return res.status(404).json({
+                success:false,
+                message:"Contest not started yet"
+            })
+        }
+        //store submission first
+        const newSubmission=await prisma.submission.create({
+            data:{
+                submissions:submissions,
+                points:0,
+                user:{connect:{id:user.id}},
+                contestToChallengeMapping:{connect:{id:mapping.id}}
+            },
+        });
+        
+        const points = await evaluateSubmission(submissions,mapping.challenge.maxPoints);
+        await prisma.submission.update({
+            where:{id:newSubmission.id},
+            data:{points}
+        });
+
+        await updateLeaderboard(mapping.contestId,user.id,points);
+        return res.json({
+            success:true,
+            message:"Submission evaluated",
+            submissionId:newSubmission.id,
+            points,
+        });
+    }catch(err){
+        return res.status(500).json({
+            success:false,
+            message:"Internal server error"
+        });
+    }
 })
 
 export default router;

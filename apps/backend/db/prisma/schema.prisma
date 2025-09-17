@@ -73,8 +73,8 @@ model LeaderBoard{
   id            String    @id    @default(uuid())
   contestId     String
   userId        String
-  rank          Int
+  score          Int      @default(0)
   contest       Contest   @relation(fields:[contestId],references:[id])
   user          User      @relation(fields:[userId],references:[id])
-  @@unique([contestId,rank])
+  @@unique([contestId,userId])
 }

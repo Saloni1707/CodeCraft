@@ -6973,63 +6973,63 @@ export namespace Prisma {
   }
 
   export type LeaderBoardAvgAggregateOutputType = {
-    rank: number | null
+    score: number | null
   }
 
   export type LeaderBoardSumAggregateOutputType = {
-    rank: number | null
+    score: number | null
   }
 
   export type LeaderBoardMinAggregateOutputType = {
     id: string | null
     contestId: string | null
     userId: string | null
-    rank: number | null
+    score: number | null
   }
 
   export type LeaderBoardMaxAggregateOutputType = {
     id: string | null
     contestId: string | null
     userId: string | null
-    rank: number | null
+    score: number | null
   }
 
   export type LeaderBoardCountAggregateOutputType = {
     id: number
     contestId: number
     userId: number
-    rank: number
+    score: number
     _all: number
   }
 
 
   export type LeaderBoardAvgAggregateInputType = {
-    rank?: true
+    score?: true
   }
 
   export type LeaderBoardSumAggregateInputType = {
-    rank?: true
+    score?: true
   }
 
   export type LeaderBoardMinAggregateInputType = {
     id?: true
     contestId?: true
     userId?: true
-    rank?: true
+    score?: true
   }
 
   export type LeaderBoardMaxAggregateInputType = {
     id?: true
     contestId?: true
     userId?: true
-    rank?: true
+    score?: true
   }
 
   export type LeaderBoardCountAggregateInputType = {
     id?: true
     contestId?: true
     userId?: true
-    rank?: true
+    score?: true
     _all?: true
   }
 
@@ -7123,7 +7123,7 @@ export namespace Prisma {
     id: string
     contestId: string
     userId: string
-    rank: number
+    score: number
     _count: LeaderBoardCountAggregateOutputType | null
     _avg: LeaderBoardAvgAggregateOutputType | null
     _sum: LeaderBoardSumAggregateOutputType | null
@@ -7149,7 +7149,7 @@ export namespace Prisma {
     id?: boolean
     contestId?: boolean
     userId?: boolean
-    rank?: boolean
+    score?: boolean
     contest?: boolean | ContestDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["leaderBoard"]>
@@ -7158,7 +7158,7 @@ export namespace Prisma {
     id?: boolean
     contestId?: boolean
     userId?: boolean
-    rank?: boolean
+    score?: boolean
     contest?: boolean | ContestDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["leaderBoard"]>
@@ -7167,7 +7167,7 @@ export namespace Prisma {
     id?: boolean
     contestId?: boolean
     userId?: boolean
-    rank?: boolean
+    score?: boolean
     contest?: boolean | ContestDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["leaderBoard"]>
@@ -7176,10 +7176,10 @@ export namespace Prisma {
     id?: boolean
     contestId?: boolean
     userId?: boolean
-    rank?: boolean
+    score?: boolean
   }
 
-  export type LeaderBoardOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "contestId" | "userId" | "rank", ExtArgs["result"]["leaderBoard"]>
+  export type LeaderBoardOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "contestId" | "userId" | "score", ExtArgs["result"]["leaderBoard"]>
   export type LeaderBoardInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     contest?: boolean | ContestDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -7203,7 +7203,7 @@ export namespace Prisma {
       id: string
       contestId: string
       userId: string
-      rank: number
+      score: number
     }, ExtArgs["result"]["leaderBoard"]>
     composites: {}
   }
@@ -7632,7 +7632,7 @@ export namespace Prisma {
     readonly id: FieldRef<"LeaderBoard", 'String'>
     readonly contestId: FieldRef<"LeaderBoard", 'String'>
     readonly userId: FieldRef<"LeaderBoard", 'String'>
-    readonly rank: FieldRef<"LeaderBoard", 'Int'>
+    readonly score: FieldRef<"LeaderBoard", 'Int'>
   }
     
 
@@ -8117,7 +8117,7 @@ export namespace Prisma {
     id: 'id',
     contestId: 'contestId',
     userId: 'userId',
-    rank: 'rank'
+    score: 'score'
   };
 
   export type LeaderBoardScalarFieldEnum = (typeof LeaderBoardScalarFieldEnum)[keyof typeof LeaderBoardScalarFieldEnum]
@@ -8506,7 +8506,7 @@ export namespace Prisma {
     id?: StringFilter<"LeaderBoard"> | string
     contestId?: StringFilter<"LeaderBoard"> | string
     userId?: StringFilter<"LeaderBoard"> | string
-    rank?: IntFilter<"LeaderBoard"> | number
+    score?: IntFilter<"LeaderBoard"> | number
     contest?: XOR<ContestScalarRelationFilter, ContestWhereInput>
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
@@ -8515,29 +8515,29 @@ export namespace Prisma {
     id?: SortOrder
     contestId?: SortOrder
     userId?: SortOrder
-    rank?: SortOrder
+    score?: SortOrder
     contest?: ContestOrderByWithRelationInput
     user?: UserOrderByWithRelationInput
   }
 
   export type LeaderBoardWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    contestId_rank?: LeaderBoardContestIdRankCompoundUniqueInput
+    contestId_userId?: LeaderBoardContestIdUserIdCompoundUniqueInput
     AND?: LeaderBoardWhereInput | LeaderBoardWhereInput[]
     OR?: LeaderBoardWhereInput[]
     NOT?: LeaderBoardWhereInput | LeaderBoardWhereInput[]
     contestId?: StringFilter<"LeaderBoard"> | string
     userId?: StringFilter<"LeaderBoard"> | string
-    rank?: IntFilter<"LeaderBoard"> | number
+    score?: IntFilter<"LeaderBoard"> | number
     contest?: XOR<ContestScalarRelationFilter, ContestWhereInput>
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
-  }, "id" | "contestId_rank">
+  }, "id" | "contestId_userId">
 
   export type LeaderBoardOrderByWithAggregationInput = {
     id?: SortOrder
     contestId?: SortOrder
     userId?: SortOrder
-    rank?: SortOrder
+    score?: SortOrder
     _count?: LeaderBoardCountOrderByAggregateInput
     _avg?: LeaderBoardAvgOrderByAggregateInput
     _max?: LeaderBoardMaxOrderByAggregateInput
@@ -8552,7 +8552,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"LeaderBoard"> | string
     contestId?: StringWithAggregatesFilter<"LeaderBoard"> | string
     userId?: StringWithAggregatesFilter<"LeaderBoard"> | string
-    rank?: IntWithAggregatesFilter<"LeaderBoard"> | number
+    score?: IntWithAggregatesFilter<"LeaderBoard"> | number
   }
 
   export type UserCreateInput = {
@@ -8836,7 +8836,7 @@ export namespace Prisma {
 
   export type LeaderBoardCreateInput = {
     id?: string
-    rank: number
+    score?: number
     contest: ContestCreateNestedOneWithoutLeaderboardInput
     user: UserCreateNestedOneWithoutLeaderboardInput
   }
@@ -8845,12 +8845,12 @@ export namespace Prisma {
     id?: string
     contestId: string
     userId: string
-    rank: number
+    score?: number
   }
 
   export type LeaderBoardUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    rank?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
     contest?: ContestUpdateOneRequiredWithoutLeaderboardNestedInput
     user?: UserUpdateOneRequiredWithoutLeaderboardNestedInput
   }
@@ -8859,26 +8859,26 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     contestId?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    rank?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
   }
 
   export type LeaderBoardCreateManyInput = {
     id?: string
     contestId: string
     userId: string
-    rank: number
+    score?: number
   }
 
   export type LeaderBoardUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    rank?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
   }
 
   export type LeaderBoardUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     contestId?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    rank?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -9173,38 +9173,38 @@ export namespace Prisma {
     points?: SortOrder
   }
 
-  export type LeaderBoardContestIdRankCompoundUniqueInput = {
+  export type LeaderBoardContestIdUserIdCompoundUniqueInput = {
     contestId: string
-    rank: number
+    userId: string
   }
 
   export type LeaderBoardCountOrderByAggregateInput = {
     id?: SortOrder
     contestId?: SortOrder
     userId?: SortOrder
-    rank?: SortOrder
+    score?: SortOrder
   }
 
   export type LeaderBoardAvgOrderByAggregateInput = {
-    rank?: SortOrder
+    score?: SortOrder
   }
 
   export type LeaderBoardMaxOrderByAggregateInput = {
     id?: SortOrder
     contestId?: SortOrder
     userId?: SortOrder
-    rank?: SortOrder
+    score?: SortOrder
   }
 
   export type LeaderBoardMinOrderByAggregateInput = {
     id?: SortOrder
     contestId?: SortOrder
     userId?: SortOrder
-    rank?: SortOrder
+    score?: SortOrder
   }
 
   export type LeaderBoardSumOrderByAggregateInput = {
-    rank?: SortOrder
+    score?: SortOrder
   }
 
   export type LeaderBoardCreateNestedManyWithoutUserInput = {
@@ -9676,14 +9676,14 @@ export namespace Prisma {
 
   export type LeaderBoardCreateWithoutUserInput = {
     id?: string
-    rank: number
+    score?: number
     contest: ContestCreateNestedOneWithoutLeaderboardInput
   }
 
   export type LeaderBoardUncheckedCreateWithoutUserInput = {
     id?: string
     contestId: string
-    rank: number
+    score?: number
   }
 
   export type LeaderBoardCreateOrConnectWithoutUserInput = {
@@ -9745,7 +9745,7 @@ export namespace Prisma {
     id?: StringFilter<"LeaderBoard"> | string
     contestId?: StringFilter<"LeaderBoard"> | string
     userId?: StringFilter<"LeaderBoard"> | string
-    rank?: IntFilter<"LeaderBoard"> | number
+    score?: IntFilter<"LeaderBoard"> | number
   }
 
   export type SubmissionUpsertWithWhereUniqueWithoutUserInput = {
@@ -9802,14 +9802,14 @@ export namespace Prisma {
 
   export type LeaderBoardCreateWithoutContestInput = {
     id?: string
-    rank: number
+    score?: number
     user: UserCreateNestedOneWithoutLeaderboardInput
   }
 
   export type LeaderBoardUncheckedCreateWithoutContestInput = {
     id?: string
     userId: string
-    rank: number
+    score?: number
   }
 
   export type LeaderBoardCreateOrConnectWithoutContestInput = {
@@ -10225,7 +10225,7 @@ export namespace Prisma {
   export type LeaderBoardCreateManyUserInput = {
     id?: string
     contestId: string
-    rank: number
+    score?: number
   }
 
   export type SubmissionCreateManyUserInput = {
@@ -10238,20 +10238,20 @@ export namespace Prisma {
 
   export type LeaderBoardUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    rank?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
     contest?: ContestUpdateOneRequiredWithoutLeaderboardNestedInput
   }
 
   export type LeaderBoardUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     contestId?: StringFieldUpdateOperationsInput | string
-    rank?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
   }
 
   export type LeaderBoardUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     contestId?: StringFieldUpdateOperationsInput | string
-    rank?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
   }
 
   export type SubmissionUpdateWithoutUserInput = {
@@ -10287,7 +10287,7 @@ export namespace Prisma {
   export type LeaderBoardCreateManyContestInput = {
     id?: string
     userId: string
-    rank: number
+    score?: number
   }
 
   export type ContestToChallengeMappingUpdateWithoutContestsInput = {
@@ -10312,20 +10312,20 @@ export namespace Prisma {
 
   export type LeaderBoardUpdateWithoutContestInput = {
     id?: StringFieldUpdateOperationsInput | string
-    rank?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
     user?: UserUpdateOneRequiredWithoutLeaderboardNestedInput
   }
 
   export type LeaderBoardUncheckedUpdateWithoutContestInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    rank?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
   }
 
   export type LeaderBoardUncheckedUpdateManyWithoutContestInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    rank?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
   }
 
   export type SubmissionCreateManyContestToChallengeMappingInput = {
