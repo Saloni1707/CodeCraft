@@ -53,7 +53,7 @@ router.post("/signup", async(req, res) => {
         const existingUser=await prisma.user.findUnique({where:{email}})
         if(existingUser){
             return res.status(400).json({success:false,message:"User already exists"})
-        }
+        }else{
         const hashedPassword=await hashPassword(password);
         const user = await prisma.user.create({
             data:{
@@ -62,6 +62,7 @@ router.post("/signup", async(req, res) => {
             }
         });
         return res.status(201).json({success:true,message:"User created successfully",user})
+        }
     }catch(error){
         if(error instanceof z.ZodError){
             return res.status(400).json({success:false,errors:error.errors})

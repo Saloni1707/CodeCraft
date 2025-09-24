@@ -169,7 +169,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/home/saloni/Desktop/Projects/CodeCrafters/CodeCrafter/apps/backend/db/generated/prisma",
+      "value": "/home/saloni/Desktop/Projects/Kode/CodeCraft/apps/backend/db/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -183,7 +183,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/home/saloni/Desktop/Projects/CodeCrafters/CodeCrafter/apps/backend/db/prisma/schema.prisma",
+    "sourceFilePath": "/home/saloni/Desktop/Projects/Kode/CodeCraft/apps/backend/db/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
