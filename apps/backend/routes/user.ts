@@ -230,4 +230,32 @@ router.post("/challenges/:challengeId/submit",authenticateToken,async(req,res) =
     }
 });
 
+router.post("/submit/:challengeId",authenticateToken,async(req,res)=>{
+    try{
+        const{challengeId}=req.params;
+        const {submissions}=req.body;
+        const user=(req as any).user;
+        const mapping = await prisma.contestToChallengeMapping.findFirst({
+            where:{
+                challengeId:challengeId
+            }
+        })
+        if(!mapping){
+            return res.status(400).json({success:false,message:"Challenge not found"});
+        }
+        const submission=await prisma.submission.create({
+            data:{
+                userId:user.id,
+                submissions,
+                contestToChallengeMappingId:mapping.id,
+                points:50
+            }
+        });
+        return res.status(200).json({success:true,submission});
+    }catch(err){
+        console.error(err);
+        return res.status(500).json({success:false,message:"Internal server error"});
+    }
+})
+
 export default router;
