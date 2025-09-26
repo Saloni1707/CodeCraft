@@ -3,6 +3,7 @@ import { comparePassword, generateToken, hashPassword } from "../lib/auth";
 import {z} from "zod";
 import prisma from "../lib/client";
 import { authenticateToken, authorizeRole } from "../middleware/authMiddleware";
+import {parse} from "date-fns";
 const router=Router();
 
 router.post("/signup",async (req,res) =>{
@@ -52,13 +53,16 @@ router.post("/signin",async (req,res)=>{
         return res.status(500).json({success:false,message:"Internal server error"})
     }
 })
-router.use(authenticateToken,authorizeRole("Admin"));
+// router.use(authenticateToken,authorizeRole("Admin"));
 
 const createContestSchema = z.object({
     title:z.string().min(1),
-    startTime:z.string().transform((value)=>new Date(value)),
-})
-router.post("/contest",async (req,res)=>{
+    startTime:z.string().transform((value)=>{
+        return parse(value, "yyyy-MM-dd h:mm a", new Date());
+    }),
+});
+
+router.post("/contest", authenticateToken, authorizeRole("Admin"),async (req,res)=>{
     try{
         const{title,startTime}=createContestSchema.parse(req.body);
         const contest = await prisma.contest.create({
@@ -83,7 +87,8 @@ router.post("/contest",async (req,res)=>{
         console.error(err);
         return res.status(500).json({
             success:false,
-            message:"Internal server error"
+            message:"Internal server error",
+            error:err
         });
     }
 });
@@ -94,7 +99,7 @@ const addChallengeSchema=z.object({
     maxPoints:z.number().int().min(0)
 });
 
-router.post("/contest/:contestId/challenge",async (req,res) => {
+router.post("/contest/:contestId/challenge", authenticateToken, authorizeRole("Admin"),async (req,res) => {
     try{
         const {contestId}=req.params;
         const {title,notionDocId,maxPoints}=addChallengeSchema.parse(req.body);

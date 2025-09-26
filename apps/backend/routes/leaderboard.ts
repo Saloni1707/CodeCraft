@@ -1,61 +1,86 @@
 import {Router} from "express";
 import prisma from "../lib/client";
-import { createClient } from "redis";
+import {createClient} from "redis";
+const router = Router();
 
-const router=Router();
-
-const redis=createClient({
+const redis = createClient({
     url:process.env.REDIS_URL
-})
-redis.connect().catch(console.error);
+});
+
+redis.on('error',(err)=>{console.error("Redis connection error",err)});
+redis.on('connect',()=>{console.log("Redis connected")});
+redis.on('disconnect',()=>{console.log("Redis disconnected")});
+
+redis.connect().catch((err)=>{
+    console.error("Redis connection error",err)
+    process.exit(1);
+});
+
+process.on('SIGINT',async()=>{
+    console.log("Redis disconnected");
+    await redis.quit();
+    process.exit(0);
+});
+
+interface LeaderboardEntry {
+    userId:string;
+    email:string;
+    score:number;
+    rank:number;
+}
 
 router.get("/:contestId",async(req,res)=>{
     const {contestId} = req.params;
-    const key=`leaderboard:${contestId}`;
+    const key = `leaderboard:${contestId}`;
+    const CACHE_EXPIRY  =300;
+    const TOP_N = 10;
+
     try{
-        const cached=await redis.zRangeWithScores(key,0,9,{REV:true});
-        if(cached.length>0){
-            const userId=cached.map(c=>c.value);
-            const users=await prisma.user.findMany({
-                where:{id:{in:userId}},
+        const cached = await redis.zRangeWithScores(key,0,TOP_N-1,{REV:true});
+        if(cached.length > 0 ){
+            const userIds: string[] = cached.map((entry)=>entry.value);
+            const users = await prisma.user.findMany({
+                where:{id:{in:userIds}},
                 select:{id:true,email:true}
             });
-            const userMap=Object.fromEntries(users.map(user=>[user.id,user]));
-            const leaderboard=cached.map((c,index)=>({
-                userId:c.value,
-                email:userMap[c.value]?.email || null,
+
+            const userMap = Object.fromEntries(users.map((user)=>[user.id,user]));
+            const leaderboard:LeaderboardEntry[] = cached.map((c,index) => ({
+                userId:c.value as string,
+                email:userMap[c.value as string]?.email,
                 score:c.score,
-                rank:index+1
+                rank:index + 1
             }));
-            return res.json({success:true,source:"cache",leaderboard})
+            return res.json({success:true,source:"cache",leaderboard});
         }
-        //nothing in cache we go to prisma db
-        const leaderboardDB=await prisma.leaderBoard.findMany({
+        const leaderboardDB = await prisma.leaderBoard.findMany({
             where:{contestId},
             orderBy:{score:"desc"},
-            take:10,
-            include:{user:{select:{email:true}}}
+            take:TOP_N,
+            include:{user:{select:{id:true,email:true}}}
         });
-        //Hydrate Redis for future requests
-        if(leaderboardDB.length>0){
-            await redis.zAdd(
-                key,
-                leaderboardDB.map(entry => ({score:entry.score,value:entry.userId}))
-            );
+        if(leaderboardDB.length > 0 ){
+            try{
+                await redis.zAdd(
+                    key,
+                    leaderboardDB.map((entry)=>({score:entry.score,value:entry.userId}))
+                );
+                await redis.expire(key,CACHE_EXPIRY);
+            }catch(redisError){
+                console.error("Redis error",redisError);
+            }
         }
-        const leaderboard=leaderboardDB.map((entry,index) =>({
+        const leaderboard:LeaderboardEntry[] = leaderboardDB.map((entry,index)=>({
             userId:entry.userId,
             email:entry.user.email,
             score:entry.score,
-            rank:index+1
+            rank:index + 1
         }));
-
         return res.json({success:true,source:"db",leaderboard});
-    }catch(err){
-        console.error(err);
-        return res.status(500).json({success:false,message:"Internal server error"})
+    }catch(error){
+        console.error("Database error",error);
+        return res.status(500).json({success:false,message:"Internal server error"});
     }
-
-})
-
+    
+});
 export default router;
