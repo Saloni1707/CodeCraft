@@ -1,5 +1,5 @@
-import prisma from "./client";
 import {createClient} from "redis";
+import prisma from "../lib/client";
 
 const redis = createClient({
     url:process.env.REDIS_URL

@@ -5,7 +5,7 @@ import {
     updateScoreInDB,
     updateScoreInRedis,
     getUserEmailsByIds
-  } from "../lib/LeaderBoardRepo";
+  } from "../repositories/LeaderBoard";
   
   export interface LeaderboardEntry {
     userId: string;
@@ -24,7 +24,7 @@ import {
       if (cached && cached.length > 0) {
         const userIds = cached.map(entry => entry.userId);
         const users = await getUserEmailsByIds(userIds);
-        const userMap = Object.fromEntries(users.map(u => [u.id, u.email]));
+        const userMap = Object.fromEntries(users.map((u: { id: any; email: any; }) => [u.id, u.email]));
         return cached.map((entry: LeaderboardEntry, idx: number) => ({
           userId: entry.userId,
           email: userMap[entry.userId],
@@ -38,11 +38,11 @@ import {
       if (leaderboardDB.length > 0) {
         await cacheLeaderboardInRedis(
           contestId,
-          leaderboardDB.map(entry => ({ score: entry.score, userId: entry.userId })),
+          leaderboardDB.map((entry: { score: any; userId: any; }) => ({ score: entry.score, userId: entry.userId })),
           this.CACHE_EXPIRY
         );
       }
-      return leaderboardDB.map((entry, idx) => ({
+      return leaderboardDB.map((entry: { userId: any; user: { email: any; }; score: any; }, idx: number) => ({
         userId: entry.userId,
         email: entry.user.email,
         score: entry.score,
