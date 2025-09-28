@@ -4766,6 +4766,7 @@ export namespace Prisma {
   export type ChallengeMinAggregateOutputType = {
     id: string | null
     title: string | null
+    description: string | null
     notionDocId: string | null
     contestId: string | null
     maxPoints: number | null
@@ -4774,6 +4775,7 @@ export namespace Prisma {
   export type ChallengeMaxAggregateOutputType = {
     id: string | null
     title: string | null
+    description: string | null
     notionDocId: string | null
     contestId: string | null
     maxPoints: number | null
@@ -4782,6 +4784,7 @@ export namespace Prisma {
   export type ChallengeCountAggregateOutputType = {
     id: number
     title: number
+    description: number
     notionDocId: number
     contestId: number
     maxPoints: number
@@ -4800,6 +4803,7 @@ export namespace Prisma {
   export type ChallengeMinAggregateInputType = {
     id?: true
     title?: true
+    description?: true
     notionDocId?: true
     contestId?: true
     maxPoints?: true
@@ -4808,6 +4812,7 @@ export namespace Prisma {
   export type ChallengeMaxAggregateInputType = {
     id?: true
     title?: true
+    description?: true
     notionDocId?: true
     contestId?: true
     maxPoints?: true
@@ -4816,6 +4821,7 @@ export namespace Prisma {
   export type ChallengeCountAggregateInputType = {
     id?: true
     title?: true
+    description?: true
     notionDocId?: true
     contestId?: true
     maxPoints?: true
@@ -4911,6 +4917,7 @@ export namespace Prisma {
   export type ChallengeGroupByOutputType = {
     id: string
     title: string
+    description: string | null
     notionDocId: string
     contestId: string
     maxPoints: number
@@ -4938,6 +4945,7 @@ export namespace Prisma {
   export type ChallengeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     title?: boolean
+    description?: boolean
     notionDocId?: boolean
     contestId?: boolean
     maxPoints?: boolean
@@ -4948,6 +4956,7 @@ export namespace Prisma {
   export type ChallengeSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     title?: boolean
+    description?: boolean
     notionDocId?: boolean
     contestId?: boolean
     maxPoints?: boolean
@@ -4956,6 +4965,7 @@ export namespace Prisma {
   export type ChallengeSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     title?: boolean
+    description?: boolean
     notionDocId?: boolean
     contestId?: boolean
     maxPoints?: boolean
@@ -4964,12 +4974,13 @@ export namespace Prisma {
   export type ChallengeSelectScalar = {
     id?: boolean
     title?: boolean
+    description?: boolean
     notionDocId?: boolean
     contestId?: boolean
     maxPoints?: boolean
   }
 
-  export type ChallengeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "notionDocId" | "contestId" | "maxPoints", ExtArgs["result"]["challenge"]>
+  export type ChallengeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "notionDocId" | "contestId" | "maxPoints", ExtArgs["result"]["challenge"]>
   export type ChallengeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     contestToChallengeMapping?: boolean | Challenge$contestToChallengeMappingArgs<ExtArgs>
     _count?: boolean | ChallengeCountOutputTypeDefaultArgs<ExtArgs>
@@ -4985,6 +4996,7 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       title: string
+      description: string | null
       notionDocId: string
       contestId: string
       maxPoints: number
@@ -5414,6 +5426,7 @@ export namespace Prisma {
   interface ChallengeFieldRefs {
     readonly id: FieldRef<"Challenge", 'String'>
     readonly title: FieldRef<"Challenge", 'String'>
+    readonly description: FieldRef<"Challenge", 'String'>
     readonly notionDocId: FieldRef<"Challenge", 'String'>
     readonly contestId: FieldRef<"Challenge", 'String'>
     readonly maxPoints: FieldRef<"Challenge", 'Int'>
@@ -8093,6 +8106,7 @@ export namespace Prisma {
   export const ChallengeScalarFieldEnum: {
     id: 'id',
     title: 'title',
+    description: 'description',
     notionDocId: 'notionDocId',
     contestId: 'contestId',
     maxPoints: 'maxPoints'
@@ -8137,6 +8151,14 @@ export namespace Prisma {
   };
 
   export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+  export const NullsOrder: {
+    first: 'first',
+    last: 'last'
+  };
+
+  export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
   /**
@@ -8383,6 +8405,7 @@ export namespace Prisma {
     NOT?: ChallengeWhereInput | ChallengeWhereInput[]
     id?: StringFilter<"Challenge"> | string
     title?: StringFilter<"Challenge"> | string
+    description?: StringNullableFilter<"Challenge"> | string | null
     notionDocId?: StringFilter<"Challenge"> | string
     contestId?: StringFilter<"Challenge"> | string
     maxPoints?: IntFilter<"Challenge"> | number
@@ -8392,6 +8415,7 @@ export namespace Prisma {
   export type ChallengeOrderByWithRelationInput = {
     id?: SortOrder
     title?: SortOrder
+    description?: SortOrderInput | SortOrder
     notionDocId?: SortOrder
     contestId?: SortOrder
     maxPoints?: SortOrder
@@ -8404,6 +8428,7 @@ export namespace Prisma {
     OR?: ChallengeWhereInput[]
     NOT?: ChallengeWhereInput | ChallengeWhereInput[]
     title?: StringFilter<"Challenge"> | string
+    description?: StringNullableFilter<"Challenge"> | string | null
     notionDocId?: StringFilter<"Challenge"> | string
     contestId?: StringFilter<"Challenge"> | string
     maxPoints?: IntFilter<"Challenge"> | number
@@ -8413,6 +8438,7 @@ export namespace Prisma {
   export type ChallengeOrderByWithAggregationInput = {
     id?: SortOrder
     title?: SortOrder
+    description?: SortOrderInput | SortOrder
     notionDocId?: SortOrder
     contestId?: SortOrder
     maxPoints?: SortOrder
@@ -8429,6 +8455,7 @@ export namespace Prisma {
     NOT?: ChallengeScalarWhereWithAggregatesInput | ChallengeScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Challenge"> | string
     title?: StringWithAggregatesFilter<"Challenge"> | string
+    description?: StringNullableWithAggregatesFilter<"Challenge"> | string | null
     notionDocId?: StringWithAggregatesFilter<"Challenge"> | string
     contestId?: StringWithAggregatesFilter<"Challenge"> | string
     maxPoints?: IntWithAggregatesFilter<"Challenge"> | number
@@ -8716,6 +8743,7 @@ export namespace Prisma {
   export type ChallengeCreateInput = {
     id?: string
     title: string
+    description?: string | null
     notionDocId: string
     contestId: string
     maxPoints: number
@@ -8725,6 +8753,7 @@ export namespace Prisma {
   export type ChallengeUncheckedCreateInput = {
     id?: string
     title: string
+    description?: string | null
     notionDocId: string
     contestId: string
     maxPoints: number
@@ -8734,6 +8763,7 @@ export namespace Prisma {
   export type ChallengeUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     notionDocId?: StringFieldUpdateOperationsInput | string
     contestId?: StringFieldUpdateOperationsInput | string
     maxPoints?: IntFieldUpdateOperationsInput | number
@@ -8743,6 +8773,7 @@ export namespace Prisma {
   export type ChallengeUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     notionDocId?: StringFieldUpdateOperationsInput | string
     contestId?: StringFieldUpdateOperationsInput | string
     maxPoints?: IntFieldUpdateOperationsInput | number
@@ -8752,6 +8783,7 @@ export namespace Prisma {
   export type ChallengeCreateManyInput = {
     id?: string
     title: string
+    description?: string | null
     notionDocId: string
     contestId: string
     maxPoints: number
@@ -8760,6 +8792,7 @@ export namespace Prisma {
   export type ChallengeUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     notionDocId?: StringFieldUpdateOperationsInput | string
     contestId?: StringFieldUpdateOperationsInput | string
     maxPoints?: IntFieldUpdateOperationsInput | number
@@ -8768,6 +8801,7 @@ export namespace Prisma {
   export type ChallengeUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     notionDocId?: StringFieldUpdateOperationsInput | string
     contestId?: StringFieldUpdateOperationsInput | string
     maxPoints?: IntFieldUpdateOperationsInput | number
@@ -9096,9 +9130,30 @@ export namespace Prisma {
     _max?: NestedIntFilter<$PrismaModel>
   }
 
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
+  }
+
   export type ChallengeCountOrderByAggregateInput = {
     id?: SortOrder
     title?: SortOrder
+    description?: SortOrder
     notionDocId?: SortOrder
     contestId?: SortOrder
     maxPoints?: SortOrder
@@ -9111,6 +9166,7 @@ export namespace Prisma {
   export type ChallengeMaxOrderByAggregateInput = {
     id?: SortOrder
     title?: SortOrder
+    description?: SortOrder
     notionDocId?: SortOrder
     contestId?: SortOrder
     maxPoints?: SortOrder
@@ -9119,6 +9175,7 @@ export namespace Prisma {
   export type ChallengeMinOrderByAggregateInput = {
     id?: SortOrder
     title?: SortOrder
+    description?: SortOrder
     notionDocId?: SortOrder
     contestId?: SortOrder
     maxPoints?: SortOrder
@@ -9126,6 +9183,24 @@ export namespace Prisma {
 
   export type ChallengeSumOrderByAggregateInput = {
     maxPoints?: SortOrder
+  }
+
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type UserScalarRelationFilter = {
@@ -9479,6 +9554,10 @@ export namespace Prisma {
     connect?: ContestToChallengeMappingWhereUniqueInput | ContestToChallengeMappingWhereUniqueInput[]
   }
 
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
+  }
+
   export type ContestToChallengeMappingUpdateManyWithoutChallengeNestedInput = {
     create?: XOR<ContestToChallengeMappingCreateWithoutChallengeInput, ContestToChallengeMappingUncheckedCreateWithoutChallengeInput> | ContestToChallengeMappingCreateWithoutChallengeInput[] | ContestToChallengeMappingUncheckedCreateWithoutChallengeInput[]
     connectOrCreate?: ContestToChallengeMappingCreateOrConnectWithoutChallengeInput | ContestToChallengeMappingCreateOrConnectWithoutChallengeInput[]
@@ -9672,6 +9751,48 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
   export type LeaderBoardCreateWithoutUserInput = {
@@ -9886,6 +10007,7 @@ export namespace Prisma {
   export type ChallengeCreateWithoutContestToChallengeMappingInput = {
     id?: string
     title: string
+    description?: string | null
     notionDocId: string
     contestId: string
     maxPoints: number
@@ -9894,6 +10016,7 @@ export namespace Prisma {
   export type ChallengeUncheckedCreateWithoutContestToChallengeMappingInput = {
     id?: string
     title: string
+    description?: string | null
     notionDocId: string
     contestId: string
     maxPoints: number
@@ -9969,6 +10092,7 @@ export namespace Prisma {
   export type ChallengeUpdateWithoutContestToChallengeMappingInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     notionDocId?: StringFieldUpdateOperationsInput | string
     contestId?: StringFieldUpdateOperationsInput | string
     maxPoints?: IntFieldUpdateOperationsInput | number
@@ -9977,6 +10101,7 @@ export namespace Prisma {
   export type ChallengeUncheckedUpdateWithoutContestToChallengeMappingInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     notionDocId?: StringFieldUpdateOperationsInput | string
     contestId?: StringFieldUpdateOperationsInput | string
     maxPoints?: IntFieldUpdateOperationsInput | number

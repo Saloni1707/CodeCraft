@@ -143,6 +143,7 @@ exports.Prisma.ContestToChallengeMappingScalarFieldEnum = {
 exports.Prisma.ChallengeScalarFieldEnum = {
   id: 'id',
   title: 'title',
+  description: 'description',
   notionDocId: 'notionDocId',
   contestId: 'contestId',
   maxPoints: 'maxPoints'
@@ -172,6 +173,11 @@ exports.Prisma.SortOrder = {
 exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
+};
+
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
 };
 exports.Role = exports.$Enums.Role = {
   User: 'User',

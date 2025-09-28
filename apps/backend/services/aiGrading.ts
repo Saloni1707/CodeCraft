@@ -1,23 +1,24 @@
+import { GoogleGenerativeAI } from "@google/generative-ai"; 
 
 export interface GradingResult {
-    points:number;
-    maxPoints:number;
-    feedback:string;
-    criteria:{
-        correctness:number;
-        codeQuality:number;
-        effiency:number;
-        completeness:number;
+    points: number;
+    maxPoints: number;
+    feedback: string;
+    criteria: {
+        correctness: number;
+        codeQuality: number;
+        efficiency: number;
+        completeness: number;
     };
 }
 
 export async function gradeSubmissionwithAI(
-    code:string,
-    challengeTitle:string,
-    challengeDescription:string,
-    maxPoints:number
-){
-    try{
+    code: string,
+    challengeTitle: string,
+    challengeDescription: string,
+    maxPoints: number
+): Promise<GradingResult> {
+    try {
         const prompt = `
             You are an expert code reviewer grading a programming submission. Please evaluate the following code submission:
 
@@ -38,16 +39,26 @@ export async function gradeSubmissionwithAI(
 
             Respond in this JSON format:
             {
-            "totalPoints": <number>,
-            "breakdown": {
-                "correctness": <0-10>,
-                "codeQuality": <0-10>,
-                "efficiency": <0-10>,
-                "completeness": <0-10>
-            },
-            "feedback": "<string>"
-        }`;
-    }catch(error){
+            "points": <number>,
+            "maxPoints": <number>,
+            "feedback": "<string>",
+            "criteria": {
+                "correctness": <number>,
+                "codeQuality": <number>,
+                "efficiency": <number>,
+                "completeness": <number>
+            }
+            }
+        `;
+
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        const result = await model.generateContent(prompt);
+        const response = await result.response.text();
+        const grading: GradingResult = JSON.parse(response);
+
+        return grading;
+    } catch (error) {
         console.error("Error grading submission:", error);
         throw error;
     }

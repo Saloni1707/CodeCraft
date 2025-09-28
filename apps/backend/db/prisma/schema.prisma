@@ -51,6 +51,7 @@ model ContestToChallengeMapping{
 model Challenge{
   id            String    @id    @default(uuid())
   title         String
+  description   String?
   notionDocId   String
   contestId     String
   maxPoints     Int

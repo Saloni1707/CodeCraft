@@ -1,8 +1,11 @@
 import {Router} from "express";
 import prisma from "../lib/client";
 import {authenticateToken} from "../middleware/authMiddleware";
-import {evaluateSubmission,updateLeaderboard} from "../lib/scoringService";
+//import {evaluateSubmission,updateLeaderboard} from "../lib/scoringService"; this dummy score system 
 import { createClient } from "redis";
+import { gradeSubmissionwithAI } from "../services/aiGrading";
+import { LeaderboardService } from "../services/LeaderboardService";
+
 const router=Router();
 
 const redis=createClient({
@@ -97,7 +100,7 @@ router.get("/:contestId",async(req,res)=>{
         })
     }
 })
-//challenge inside a contest
+
 router.get("/:contestId/challenges/:challengeId",async(req,res)=>{
     try{
         const{contestId,challengeId}=req.params;
@@ -161,7 +164,7 @@ router.post("/submit/:challengeId",authenticateToken,async(req,res)=>{
                 message:"Contest not started yet"
             })
         }
-        //store submission first
+        //storing our submission first to db :)
         const newSubmission=await prisma.submission.create({
             data:{
                 submissions:submissions,
@@ -171,20 +174,32 @@ router.post("/submit/:challengeId",authenticateToken,async(req,res)=>{
             },
         });
         
-        const points = await evaluateSubmission(submissions,mapping.challenge.maxPoints);
+        // const points = await evaluateSubmission(submissions,mapping.challenge.maxPoints);
+        // await prisma.submission.update({
+        //     where:{id:newSubmission.id}, //this was our dummy point system
+        //     data:{points}
+        // });
+
+        const grading =  await gradeSubmissionwithAI(
+            submissions,
+            mapping.challenge.title,
+            mapping.challenge.description || "",
+            mapping.challenge.maxPoints
+        );
+
         await prisma.submission.update({
             where:{id:newSubmission.id},
-            data:{points}
+            data:{points:grading.points}
         });
 
-        await updateLeaderboard(mapping.contestId,user.id,points);
-        return res.json({
+        await LeaderboardService.updateUserScore(mapping.contestId,user.id,grading.points);
+        return res.status(200).json({
             success:true,
-            message:"Submission evaluated",
             submissionId:newSubmission.id,
-            points,
+            grading
         });
     }catch(err){
+        console.error(err);
         return res.status(500).json({
             success:false,
             message:"Internal server error"
