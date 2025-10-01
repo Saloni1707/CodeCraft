@@ -156,13 +156,13 @@ router.post("/submit/:challengeId",authenticateToken,async(req,res)=>{
             return res.status(404).json({
                 success:false,
                 message:"Challenge not found"
-            })
+            });
         }
         if(mapping.contests.startTime>new Date()){
             return res.status(404).json({
                 success:false,
                 message:"Contest not started yet"
-            })
+            });
         }
         //storing our submission first to db :)
         const newSubmission=await prisma.submission.create({
@@ -192,7 +192,7 @@ router.post("/submit/:challengeId",authenticateToken,async(req,res)=>{
             data:{points:grading.points}
         });
 
-        await LeaderboardService.updateUserScore(mapping.contestId,user.id,grading.points);
+        await LeaderboardService.handleSubmission(mapping.contestId,user.id);
         return res.status(200).json({
             success:true,
             submissionId:newSubmission.id,
