@@ -6,6 +6,7 @@ import {
     updateScoreInRedis,
     getUserEmailsByIds
   } from "../repositories/LeaderBoard";
+  import prisma from "../lib/client";
   
   export interface LeaderboardEntry {
     userId: string;
@@ -17,6 +18,28 @@ import {
   export class LeaderboardService {
     static TOP_N = 10;
     static CACHE_EXPIRY = 300;
+
+    static async recalculateUserScoreForContest(contestId:string,userId:string){
+      const mappings=await prisma.contestToChallengeMapping.findMany({
+        where:{contestId},
+        select:{id:true}
+      });
+      const mappingIds=mappings.map((m)=>m.id);
+      let totalScore=0;
+      for(const mappingId of mappingIds){
+        const best = await prisma.submission.aggregate({
+          where:{contestToChallengeMappingId:mappingId,userId},
+          _max:{points:true}
+        });
+        totalScore +=best._max.points || 0;
+      }
+      await updateScoreInDB(contestId,userId,totalScore);
+      await updateScoreInRedis(contestId,userId,totalScore);
+    }
+
+    static async handleSubmission(contestId:string,userId:string){
+      await this.recalculateUserScoreForContest(contestId,userId);
+    }
   
     static async getLeaderboard(contestId: string): Promise<LeaderboardEntry[]> {
       let cached:LeaderboardEntry[] = await getLeaderboardFromRedis(contestId, this.TOP_N);
@@ -56,6 +79,24 @@ import {
     }
   
     static async recalculateLeaderboard(contestId: string) {
-      // post-contest recalculation here 
+      const mappings = await prisma.contestToChallengeMapping.findMany({
+        where:{contestId},
+        select:{id:true}
+      });
+      const mappingIds=mappings.map((m)=>m.id);
+      const userIds = await prisma.submission.findMany({
+        where:{contestToChallengeMappingId:{in:mappingIds}},
+        distinct:["userId"],
+        select:{userId:true}
+      });
+      for(const{userId} of userIds){
+        await this.recalculateUserScoreForContest(contestId,userId);
+      }
+      const leaderboard = await getLeaderboardFromDB(contestId,this.TOP_N);
+      await cacheLeaderboardInRedis(
+        contestId,
+        leaderboard.map(e=>({userId:e.userId,score:e.score})),
+        this.CACHE_EXPIRY
+      )
     }
   }
