@@ -199,20 +199,20 @@ router.get("/challenges/:challengeId",async(req,res)=>{
         console.log(err);
         return res.status(500).json({success:false,message:"Internal server error"});
     }
-})
+});
 
 router.post("/challenges/:challengeId/submit",authenticateToken,async(req,res) =>{
     try{
-        const{ id }=req.params;
+        const{ challengeId }=req.params;
         const {submissions}=req.body;
         
         const user=(req as any).user;
         const mapping = await prisma.contestToChallengeMapping.findFirst({
             where:{
-                challengeId:id
+                challengeId:challengeId
             }
         })
-        if(!mapping){
+       if(!mapping){
             return res.status(400).json({success:false,message:"Challenge not found"});
         }
         const submission=await prisma.submission.create({
@@ -229,33 +229,5 @@ router.post("/challenges/:challengeId/submit",authenticateToken,async(req,res) =
         return res.status(500).json({success:false,message:"Internal server error"});
     }
 });
-
-router.post("/submit/:challengeId",authenticateToken,async(req,res)=>{
-    try{
-        const{challengeId}=req.params;
-        const {submissions}=req.body;
-        const user=(req as any).user;
-        const mapping = await prisma.contestToChallengeMapping.findFirst({
-            where:{
-                challengeId:challengeId
-            }
-        })
-        if(!mapping){
-            return res.status(400).json({success:false,message:"Challenge not found"});
-        }
-        const submission=await prisma.submission.create({
-            data:{
-                userId:user.id,
-                submissions,
-                contestToChallengeMappingId:mapping.id,
-                points:50
-            }
-        });
-        return res.status(200).json({success:true,submission});
-    }catch(err){
-        console.error(err);
-        return res.status(500).json({success:false,message:"Internal server error"});
-    }
-})
 
 export default router;
