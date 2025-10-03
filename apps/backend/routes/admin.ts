@@ -60,15 +60,19 @@ const createContestSchema = z.object({
     startTime:z.string().transform((value)=>{
         return parse(value, "yyyy-MM-dd h:mm a", new Date());
     }),
+    endTime:z.string().transform((value)=>{
+        return parse(value, "yyyy-MM-dd h:mm a", new Date());
+    })
 });
 
 router.post("/contest", authenticateToken, authorizeRole("Admin"),async (req,res)=>{
     try{
-        const{title,startTime}=createContestSchema.parse(req.body);
+        const{title,startTime,endTime}=createContestSchema.parse(req.body);
         const contest = await prisma.contest.create({
             data:{
                 title,
-                startTime
+                startTime,
+                endTime
             }
         });
         return res.status(200).json({

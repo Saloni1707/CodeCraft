@@ -130,7 +130,8 @@ exports.Prisma.UserScalarFieldEnum = {
 exports.Prisma.ContestScalarFieldEnum = {
   id: 'id',
   title: 'title',
-  startTime: 'startTime'
+  startTime: 'startTime',
+  endTime: 'endTime'
 };
 
 exports.Prisma.ContestToChallengeMappingScalarFieldEnum = {

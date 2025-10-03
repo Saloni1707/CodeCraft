@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import prisma from "../lib/client";
 import {hashPassword,comparePassword,generateToken} from "../lib/auth";
 import {authenticateToken, authorizeRole } from "../middleware/authMiddleware";
+import { gradeSubmissionwithAI } from "../services/aiGrading";
 dotenv.config();
 
 const router = Router();
@@ -201,32 +202,111 @@ router.get("/challenges/:challengeId",async(req,res)=>{
     }
 });
 
-router.post("/challenges/:challengeId/submit",authenticateToken,async(req,res) =>{
-    try{
-        const{ challengeId }=req.params;
-        const {submissions}=req.body;
-        
-        const user=(req as any).user;
-        const mapping = await prisma.contestToChallengeMapping.findFirst({
-            where:{
-                challengeId:challengeId
-            }
-        })
-       if(!mapping){
-            return res.status(400).json({success:false,message:"Challenge not found"});
+router.post("/challenges/:challengeId/submit", authenticateToken, async(req, res) => {
+    try {
+        const { challengeId } = req.params;
+        const { submissions } = req.body;
+        const user = (req as any).user;
+
+        // Validate submission exists
+        if (!submissions || typeof submissions !== 'string') {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid submission format"
+            });
         }
-        const submission=await prisma.submission.create({
-            data:{
-                userId:user.id,
-                submissions,
-                contestToChallengeMappingId:mapping.id,
-                points:0,
+
+        const mapping = await prisma.contestToChallengeMapping.findFirst({
+            where: {
+                challengeId: challengeId
+            },
+            include: {
+                contests: true
             }
         });
-        return res.status(200).json({success:true,submission});
-    }catch(err){
-        console.error(err);
-        return res.status(500).json({success:false,message:"Internal server error"});
+
+        if (!mapping) {
+            return res.status(400).json({
+                success: false,
+                message: "Challenge not found in any contest"
+            });
+        }
+
+        const now = new Date();
+        const contest = mapping.contests;
+        
+        if (contest.startTime > now) {
+            return res.status(403).json({
+                success: false,
+                message: "Contest has not started yet"
+            });
+        }
+
+        if (contest.endTime < now) {
+            return res.status(403).json({
+                success: false,
+                message: "Contest has ended"
+            });
+        }
+
+        // Get challenge details
+        const challenge = await prisma.challenge.findUnique({
+            where: { id: challengeId }
+        });
+
+        if (!challenge) {
+            return res.status(404).json({
+                success: false,
+                message: "Challenge not found"
+            });
+        }
+
+        const gradingResult = await gradeSubmissionwithAI(
+            submissions,
+            challenge.title,
+            challenge.description || "",
+            challenge.maxPoints
+        );
+
+      
+        const submission = await prisma.submission.create({
+            data: {
+                userId: user.id,
+                submissions,
+                contestToChallengeMappingId: mapping.id,
+                points: gradingResult.points,
+            }
+        });
+
+        
+        return res.status(200).json({
+            success: true,
+            submission: {
+                id: submission.id,
+                points: gradingResult.points,
+                maxPoints: gradingResult.maxPoints,
+                submittedAt: submission.createdAt
+            },
+            grading: {
+                feedback: gradingResult.feedback,
+                criteria: gradingResult.criteria
+            }
+        });
+
+    } catch (err) {
+        console.error("Submission error:", err);
+        
+        if (err instanceof Error && err.message.includes("API")) {
+            return res.status(503).json({
+                success: false,
+                message: "Grading service temporarily unavailable"
+            });
+        }
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
     }
 });
 

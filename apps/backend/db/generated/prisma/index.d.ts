@@ -2568,18 +2568,21 @@ export namespace Prisma {
     id: string | null
     title: string | null
     startTime: Date | null
+    endTime: Date | null
   }
 
   export type ContestMaxAggregateOutputType = {
     id: string | null
     title: string | null
     startTime: Date | null
+    endTime: Date | null
   }
 
   export type ContestCountAggregateOutputType = {
     id: number
     title: number
     startTime: number
+    endTime: number
     _all: number
   }
 
@@ -2588,18 +2591,21 @@ export namespace Prisma {
     id?: true
     title?: true
     startTime?: true
+    endTime?: true
   }
 
   export type ContestMaxAggregateInputType = {
     id?: true
     title?: true
     startTime?: true
+    endTime?: true
   }
 
   export type ContestCountAggregateInputType = {
     id?: true
     title?: true
     startTime?: true
+    endTime?: true
     _all?: true
   }
 
@@ -2679,6 +2685,7 @@ export namespace Prisma {
     id: string
     title: string
     startTime: Date
+    endTime: Date
     _count: ContestCountAggregateOutputType | null
     _min: ContestMinAggregateOutputType | null
     _max: ContestMaxAggregateOutputType | null
@@ -2702,6 +2709,7 @@ export namespace Prisma {
     id?: boolean
     title?: boolean
     startTime?: boolean
+    endTime?: boolean
     contestToChallengeMapping?: boolean | Contest$contestToChallengeMappingArgs<ExtArgs>
     leaderboard?: boolean | Contest$leaderboardArgs<ExtArgs>
     _count?: boolean | ContestCountOutputTypeDefaultArgs<ExtArgs>
@@ -2711,21 +2719,24 @@ export namespace Prisma {
     id?: boolean
     title?: boolean
     startTime?: boolean
+    endTime?: boolean
   }, ExtArgs["result"]["contest"]>
 
   export type ContestSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     title?: boolean
     startTime?: boolean
+    endTime?: boolean
   }, ExtArgs["result"]["contest"]>
 
   export type ContestSelectScalar = {
     id?: boolean
     title?: boolean
     startTime?: boolean
+    endTime?: boolean
   }
 
-  export type ContestOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "startTime", ExtArgs["result"]["contest"]>
+  export type ContestOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "startTime" | "endTime", ExtArgs["result"]["contest"]>
   export type ContestInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     contestToChallengeMapping?: boolean | Contest$contestToChallengeMappingArgs<ExtArgs>
     leaderboard?: boolean | Contest$leaderboardArgs<ExtArgs>
@@ -2744,6 +2755,7 @@ export namespace Prisma {
       id: string
       title: string
       startTime: Date
+      endTime: Date
     }, ExtArgs["result"]["contest"]>
     composites: {}
   }
@@ -3172,6 +3184,7 @@ export namespace Prisma {
     readonly id: FieldRef<"Contest", 'String'>
     readonly title: FieldRef<"Contest", 'String'>
     readonly startTime: FieldRef<"Contest", 'DateTime'>
+    readonly endTime: FieldRef<"Contest", 'DateTime'>
   }
     
 
@@ -8087,7 +8100,8 @@ export namespace Prisma {
   export const ContestScalarFieldEnum: {
     id: 'id',
     title: 'title',
-    startTime: 'startTime'
+    startTime: 'startTime',
+    endTime: 'endTime'
   };
 
   export type ContestScalarFieldEnum = (typeof ContestScalarFieldEnum)[keyof typeof ContestScalarFieldEnum]
@@ -8299,6 +8313,7 @@ export namespace Prisma {
     id?: StringFilter<"Contest"> | string
     title?: StringFilter<"Contest"> | string
     startTime?: DateTimeFilter<"Contest"> | Date | string
+    endTime?: DateTimeFilter<"Contest"> | Date | string
     contestToChallengeMapping?: ContestToChallengeMappingListRelationFilter
     leaderboard?: LeaderBoardListRelationFilter
   }
@@ -8307,6 +8322,7 @@ export namespace Prisma {
     id?: SortOrder
     title?: SortOrder
     startTime?: SortOrder
+    endTime?: SortOrder
     contestToChallengeMapping?: ContestToChallengeMappingOrderByRelationAggregateInput
     leaderboard?: LeaderBoardOrderByRelationAggregateInput
   }
@@ -8318,6 +8334,7 @@ export namespace Prisma {
     NOT?: ContestWhereInput | ContestWhereInput[]
     title?: StringFilter<"Contest"> | string
     startTime?: DateTimeFilter<"Contest"> | Date | string
+    endTime?: DateTimeFilter<"Contest"> | Date | string
     contestToChallengeMapping?: ContestToChallengeMappingListRelationFilter
     leaderboard?: LeaderBoardListRelationFilter
   }, "id">
@@ -8326,6 +8343,7 @@ export namespace Prisma {
     id?: SortOrder
     title?: SortOrder
     startTime?: SortOrder
+    endTime?: SortOrder
     _count?: ContestCountOrderByAggregateInput
     _max?: ContestMaxOrderByAggregateInput
     _min?: ContestMinOrderByAggregateInput
@@ -8338,6 +8356,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"Contest"> | string
     title?: StringWithAggregatesFilter<"Contest"> | string
     startTime?: DateTimeWithAggregatesFilter<"Contest"> | Date | string
+    endTime?: DateTimeWithAggregatesFilter<"Contest"> | Date | string
   }
 
   export type ContestToChallengeMappingWhereInput = {
@@ -8643,6 +8662,7 @@ export namespace Prisma {
     id?: string
     title: string
     startTime: Date | string
+    endTime: Date | string
     contestToChallengeMapping?: ContestToChallengeMappingCreateNestedManyWithoutContestsInput
     leaderboard?: LeaderBoardCreateNestedManyWithoutContestInput
   }
@@ -8651,6 +8671,7 @@ export namespace Prisma {
     id?: string
     title: string
     startTime: Date | string
+    endTime: Date | string
     contestToChallengeMapping?: ContestToChallengeMappingUncheckedCreateNestedManyWithoutContestsInput
     leaderboard?: LeaderBoardUncheckedCreateNestedManyWithoutContestInput
   }
@@ -8659,6 +8680,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     contestToChallengeMapping?: ContestToChallengeMappingUpdateManyWithoutContestsNestedInput
     leaderboard?: LeaderBoardUpdateManyWithoutContestNestedInput
   }
@@ -8667,6 +8689,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     contestToChallengeMapping?: ContestToChallengeMappingUncheckedUpdateManyWithoutContestsNestedInput
     leaderboard?: LeaderBoardUncheckedUpdateManyWithoutContestNestedInput
   }
@@ -8675,18 +8698,21 @@ export namespace Prisma {
     id?: string
     title: string
     startTime: Date | string
+    endTime: Date | string
   }
 
   export type ContestUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    endTime?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ContestUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    endTime?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ContestToChallengeMappingCreateInput = {
@@ -9031,18 +9057,21 @@ export namespace Prisma {
     id?: SortOrder
     title?: SortOrder
     startTime?: SortOrder
+    endTime?: SortOrder
   }
 
   export type ContestMaxOrderByAggregateInput = {
     id?: SortOrder
     title?: SortOrder
     startTime?: SortOrder
+    endTime?: SortOrder
   }
 
   export type ContestMinOrderByAggregateInput = {
     id?: SortOrder
     title?: SortOrder
     startTime?: SortOrder
+    endTime?: SortOrder
   }
 
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -9989,6 +10018,7 @@ export namespace Prisma {
     id?: string
     title: string
     startTime: Date | string
+    endTime: Date | string
     leaderboard?: LeaderBoardCreateNestedManyWithoutContestInput
   }
 
@@ -9996,6 +10026,7 @@ export namespace Prisma {
     id?: string
     title: string
     startTime: Date | string
+    endTime: Date | string
     leaderboard?: LeaderBoardUncheckedCreateNestedManyWithoutContestInput
   }
 
@@ -10068,6 +10099,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     leaderboard?: LeaderBoardUpdateManyWithoutContestNestedInput
   }
 
@@ -10075,6 +10107,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     leaderboard?: LeaderBoardUncheckedUpdateManyWithoutContestNestedInput
   }
 
@@ -10259,6 +10292,7 @@ export namespace Prisma {
     id?: string
     title: string
     startTime: Date | string
+    endTime: Date | string
     contestToChallengeMapping?: ContestToChallengeMappingCreateNestedManyWithoutContestsInput
   }
 
@@ -10266,6 +10300,7 @@ export namespace Prisma {
     id?: string
     title: string
     startTime: Date | string
+    endTime: Date | string
     contestToChallengeMapping?: ContestToChallengeMappingUncheckedCreateNestedManyWithoutContestsInput
   }
 
@@ -10310,6 +10345,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     contestToChallengeMapping?: ContestToChallengeMappingUpdateManyWithoutContestsNestedInput
   }
 
@@ -10317,6 +10353,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     contestToChallengeMapping?: ContestToChallengeMappingUncheckedUpdateManyWithoutContestsNestedInput
   }
 
