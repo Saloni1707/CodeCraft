@@ -1,7 +1,6 @@
 import {Router} from "express";
 import prisma from "../lib/client";
 import {authenticateToken} from "../middleware/authMiddleware";
-//import {evaluateSubmission,updateLeaderboard} from "../lib/scoringService"; this dummy score system 
 import { createClient } from "redis";
 import { gradeSubmissionwithAI } from "../services/aiGrading";
 import { LeaderboardService } from "../services/LeaderboardService";
@@ -142,15 +141,18 @@ router.get("/:contestId/challenges/:challengeId",async(req,res)=>{
     }
 })
 
-router.post("/submit/:challengeId",authenticateToken,async(req,res)=>{
+router.get("/challenges/:challengeId/my-submissions",authenticateToken,async(req,res) => {
     try{
-        const {challengeId}=req.params;
-        const {submissions}=req.body;
+        const {challengeId} = req.params;
         const user = (req as any).user;
-
-        const mapping=await prisma.contestToChallengeMapping.findFirst({
-            where:{challengeId},
-            include:{contests:true,challenge:true}
+        const mapping = await prisma.contestToChallengeMapping.findFirst({
+            where:{
+                challengeId,
+            },
+            include:{
+                contests:true,
+                challenge:true
+            }
         });
         if(!mapping){
             return res.status(404).json({
@@ -158,45 +160,30 @@ router.post("/submit/:challengeId",authenticateToken,async(req,res)=>{
                 message:"Challenge not found"
             });
         }
-        if(mapping.contests.startTime>new Date()){
-            return res.status(404).json({
-                success:false,
-                message:"Contest not started yet"
-            });
-        }
-        //storing our submission first to db :)
-        const newSubmission=await prisma.submission.create({
-            data:{
-                submissions:submissions,
-                points:0,
-                user:{connect:{id:user.id}},
-                contestToChallengeMapping:{connect:{id:mapping.id}}
+        const userSubmissions = await prisma.submission.findMany({
+            where:{
+                userId:user.id,
+                contestToChallengeMappingId:mapping.id
             },
-        });
-        
-        // const points = await evaluateSubmission(submissions,mapping.challenge.maxPoints);
-        // await prisma.submission.update({
-        //     where:{id:newSubmission.id}, //this was our dummy point system
-        //     data:{points}
-        // });
-
-        const grading =  await gradeSubmissionwithAI(
-            submissions,
-            mapping.challenge.title,
-            mapping.challenge.description || "",
-            mapping.challenge.maxPoints
-        );
-
-        await prisma.submission.update({
-            where:{id:newSubmission.id},
-            data:{points:grading.points}
+            orderBy:{
+                createdAt:"desc"
+            },
+            select:{
+                id:true,
+                submissions:true,
+                points:true,
+                createdAt:true
+            }
         });
 
-        await LeaderboardService.handleSubmission(mapping.contestId,user.id);
         return res.status(200).json({
             success:true,
-            submissionId:newSubmission.id,
-            grading
+            challenge:{
+                id:mapping.challenge.id,
+                title:mapping.challenge.title,
+                maxPoints:mapping.challenge.maxPoints,
+            },
+            submission:userSubmissions
         });
     }catch(err){
         console.error(err);

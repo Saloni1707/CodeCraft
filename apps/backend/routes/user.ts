@@ -208,7 +208,6 @@ router.post("/challenges/:challengeId/submit", authenticateToken, async(req, res
         const { submissions } = req.body;
         const user = (req as any).user;
 
-        // Validate submission exists
         if (!submissions || typeof submissions !== 'string') {
             return res.status(400).json({
                 success: false,
@@ -249,7 +248,6 @@ router.post("/challenges/:challengeId/submit", authenticateToken, async(req, res
             });
         }
 
-        // Get challenge details
         const challenge = await prisma.challenge.findUnique({
             where: { id: challengeId }
         });
