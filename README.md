@@ -1,4 +1,3 @@
-This application focuses on crafting dev challenges for beginners.
 # Turborepo starter
 
 This Turborepo starter is maintained by the Turborepo core team.
