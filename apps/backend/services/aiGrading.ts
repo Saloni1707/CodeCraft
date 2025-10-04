@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai"; 
-
+import * as dotenv from "dotenv";
+dotenv.config();
 export interface GradingResult {
     points: number;
     maxPoints: number;
@@ -52,7 +53,9 @@ export async function gradeSubmissionwithAI(
         `;
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+        console.log("API Key loaded:", process.env.GEMINI_API_KEY?.substring(0, 10) + "...");
+        //const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
         const result = await model.generateContent(prompt);
         const response = await result.response.text();
         const grading: GradingResult = JSON.parse(response);

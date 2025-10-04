@@ -56,7 +56,6 @@ import {
         }));
       }
   
-      
       const leaderboardDB = await getLeaderboardFromDB(contestId, this.TOP_N);
       if (leaderboardDB.length > 0) {
         await cacheLeaderboardInRedis(
