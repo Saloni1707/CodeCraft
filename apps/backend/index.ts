@@ -5,7 +5,8 @@ import adminRouter from "./routes/admin";
 import contestRouter from "./routes/contest";
 import prisma from "./lib/client";
 import leaderboardRouter from "./routes/leaderboard";
-
+import dotenv from "dotenv";
+dotenv.config();
 const app = express();
 
 app.get("/health",(req,res) => {
