@@ -87,9 +87,7 @@ export async function gradeSubmissionwithAI(
             }
             `;
         
-                    
 
-        // FIX: Use environment variable instead of hardcoded key
         const apiKey = process.env.GEMINI_KEY!;
                 
         if (!apiKey) {
@@ -103,10 +101,8 @@ export async function gradeSubmissionwithAI(
         const result = await model.generateContent(prompt);
         const response = await result.response.text();
         
-        // FIX: Clean the response to remove markdown code fences
         let cleanedResponse = response.trim();
         
-        // Remove ```json and ``` if present
         if (cleanedResponse.startsWith('```json')) {
             cleanedResponse = cleanedResponse.replace(/^```json\s*/, '');
         }
