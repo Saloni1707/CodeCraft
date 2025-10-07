@@ -45,12 +45,13 @@ try {
 }
 const signupSchema=z.object({
     email:z.string().email("Invalid email"),
-    password:z.string().min(4,"Password must be at least 4 characters")    
+    password:z.string().min(4,"Password must be at least 4 characters"),
+    username:z.string().min(4,"Username must be at least 4 characters")   
 })
 
 router.post("/signup", async(req, res) => {
     try{
-        const{email,password}=signupSchema.parse(req.body);
+        const{email,password,username}=signupSchema.parse(req.body);
         const existingUser=await prisma.user.findUnique({where:{email}})
         if(existingUser){
             return res.status(400).json({success:false,message:"User already exists"})
@@ -59,7 +60,8 @@ router.post("/signup", async(req, res) => {
         const user = await prisma.user.create({
             data:{
                 email,
-                password:hashedPassword
+                password:hashedPassword,
+                username
             }
         });
         return res.status(201).json({success:true,message:"User created successfully",user})
@@ -74,13 +76,14 @@ router.post("/signup", async(req, res) => {
 });
 const signinSchema=z.object({
     email:z.string().email("Invalid email"),
-    password:z.string().min(4,"Password must be at least 4 characters")    
+    password:z.string().min(4,"Password must be at least 4 characters"),
+    username:z.string().min(4,"Username must be at least 4 characters")    
 })
 
 router.post("/signin",async (req, res) => {
     try{
-        const{email,password}=signinSchema.parse(req.body);
-        const user=await prisma.user.findUnique({where:{email}});
+        const{username,password}=signinSchema.parse(req.body);
+        const user=await prisma.user.findUnique({where:{username}});
         if(!user){
             return res.status(400).json({success:false,message:"Invalid credentials"})
         }
@@ -99,18 +102,6 @@ router.post("/signin",async (req, res) => {
         return res.status(500).json({success:false,message:"Internal server error"})
     }
 });
-
-router.get("/profile",authenticateToken,async(req,res)=>{
-    const user=(req as any).user;
-    res.json({success:true,user});
-});
-
-router.get("/admin/dashboard", 
-    authenticateToken, 
-    authorizeRole("Admin"), 
-    (req, res) => {
-      res.json({ success: true, message: "Welcome Admin!" });
-  });
 
 router.post('/send-otp', otpRateLimiting, async (req, res) => {
     try {
