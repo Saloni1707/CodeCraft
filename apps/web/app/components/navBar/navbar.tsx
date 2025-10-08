@@ -1,8 +1,7 @@
 'use client'
-
-import React, { useState, FC, useEffect } from 'react'
-import './navbar.css'
+import { useState, FC, useEffect } from 'react'
 import Link from 'next/link'
+import './navbar.css'
 
 interface NavbarProps {
   onGithubClick?: () => void
@@ -81,7 +80,7 @@ export const Navbar: FC<NavbarProps> = ({ onGithubClick }) => {
           return
         }
 
-        const response = await fetch('/api/users/profile', {
+        const response = await fetch('http://localhost:4000/users/profile', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -211,7 +210,7 @@ export const Navbar: FC<NavbarProps> = ({ onGithubClick }) => {
               </Link>
 
               <a
-                href="#github"
+                href="https://github.com/Saloni1707/CodeCraft"
                 className="btn-neu"
                 aria-label="Github"
                 onClick={handleGithubClick}

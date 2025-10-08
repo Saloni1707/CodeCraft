@@ -1,10 +1,13 @@
 "use client"
-import React,{useState} from 'react';
+import {useState} from 'react';
 import {useRouter} from 'next/navigation'
 import Link from 'next/link'
-
+import PasswordInput from '../components/passwordIcon/password';
+import './signup.css'
 export default function SignupPage(){
     const [email,setEmail] = useState('');
+    const [showPassword,setShowPassword] = useState(false)
+    const [username,setUsername] = useState('');
     const [password,setPassword] = useState('');
     const [error,setError] = useState('');
     const [loading,setLoading]=useState(false);
@@ -15,18 +18,19 @@ export default function SignupPage(){
         setError('');
         setLoading(true)
         try{
-            const response = await fetch('/api/users/signup',{
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/signup`,{
                 method:'POST',
                 headers:{
                     'Content-Type':'application/json',
                 },
-                body:JSON.stringify({email,password}),
+                body:JSON.stringify({email,username,password}),
             })
             const data = await response.json()
             if(!response.ok){
                 setError(data.message || 'Signup failed')
                 return
             }
+            router.push('/dashboard')
         }catch(err){
             setError('An error occured during signup')
             console.error(err)
@@ -38,10 +42,22 @@ export default function SignupPage(){
 
     return(
         <div className="auth-container">
-            <div className='auth-card'>
+            <div className="auth-card">
                 <h1>Signup</h1>
-                {error && <div className='error-message'>{error}</div>}
+                {error && <div className="error-message">{error}</div>}
                 <form onSubmit={handleSignup}>
+                    <div className="form-group">
+                        <label htmlFor='username'>Username</label>
+                        <input
+                            type="text"
+                            id="username"
+                            value={username}
+                            onChange={(e)=>setUsername(e.target.value)}
+                            required
+                            placeholder='Username'
+                        />
+
+                    </div>
                     <div className="form-group">
                         <label htmlFor="email">Email</label>
                         <input 
@@ -53,19 +69,15 @@ export default function SignupPage(){
                             placeholder='your@email.com' 
                         />
                     </div>
-                    <div className='form-group'>
-                        <label htmlFor="password">Password</label>
-                        <input
-                            id="password"
-                            type="password"
+                    <div className="form-group">
+                        <PasswordInput
                             value={password}
-                            onChange={(e)=>setPassword(e.target.value)}
+                            onChange={(e) => setPassword(e.target.value)}
                             required
-                            placeholder='Enter your password'
                         />
                     </div>
 
-                    <button type="submit" disabled={loading} className='submit-btn'>
+                    <button type="submit" disabled={loading} className="submit-btn">
                         {loading ? 'Signing up...' : 'Signup'}
                     </button>
                 </form>

@@ -1,11 +1,12 @@
 "use client"
-
+//import './signin.css'
 import React,{useState} from "react"
 import {useRouter} from "next/navigation"
 import Link from "next/link"
+import styles from "../signup/signup.module.css"
 
 export default function SigninPage(){
-    const [email,setEmail] = useState('')
+    const [username,setUsername] = useState('')
     const [password,setPassword]=useState('')
     const [error,setError] = useState('')
     const [loading,setLoading] = useState(false)
@@ -17,12 +18,12 @@ export default function SigninPage(){
         setLoading(true)
 
         try{
-            const response = await fetch('/api/user/signin',{
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/signin`,{
                 method:'POST',
                 headers:{
                     'Content-Type':'application/json',
                 },
-                body:JSON.stringify({email,password})
+                body:JSON.stringify({username,password})
             })
             const data = await response.json();
             if(!response.ok){
@@ -41,23 +42,23 @@ export default function SigninPage(){
     }
 
     return(
-        <div className="auth-container">
-            <div className="auth-card">
+        <div className={styles.authContainer}>
+            <div className={styles.authCard}>
                 <h1>Signin</h1>
-                {error && <div className="error-message">{error}</div>}
+                {error && <div className={styles.errorMessage}>{error}</div>}
                 <form onSubmit={handleSignin}>
-                    <div className="form-group">
-                        <label htmlFor="email">Email</label>
+                    <div className={styles.formGroup}>
+                        <label htmlFor="username">Username</label>
                         <input
-                            id="email"
-                            type="email"
-                            value={email}
-                            onChange={(e)=>setEmail(e.target.value)}
+                            id="username"
+                            type="text"
+                            value={username}
+                            onChange={(e)=>setUsername(e.target.value)}
                             required
-                            placeholder="your@email.com"
+                            placeholder="Username"
                         />
                     </div>
-                    <div className="form-group">
+                    <div className={styles.formGroup}>
                         <label htmlFor="password">Password</label>
                         <input
                             id="password"
@@ -68,11 +69,11 @@ export default function SigninPage(){
                             placeholder="Enter your password"
                         />
                     </div>
-                    <button type="submit" disabled={loading} className="submit-btn">
+                    <button type="submit" disabled={loading} className={styles.submitBtn}>
                         {loading ? 'Signing in...' : 'Signin'}
                     </button>
                 </form>
-                <p className="auth-link">
+                <p className={styles.authLink}>
                     Don't have an account? <Link href="/signup">Signup here</Link>
                 </p>
             </div>
