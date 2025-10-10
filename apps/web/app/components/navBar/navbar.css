@@ -3,7 +3,7 @@
    --bg: surface; --text: main; --muted: secondary; --primary: accent
 */
 :root {
-  --bg: #f1f1f7;
+  --bg: #ffffff;
   --text: #1f2a37;
   --muted: #667085;
   --primary: #2563eb;

@@ -1,5 +1,5 @@
 'use client'
-import { useState, FC, useEffect } from 'react'
+import { useState, FC, useEffect, SVGProps } from 'react'
 import Link from 'next/link'
 import './navbar.css'
 
@@ -13,7 +13,7 @@ interface User {
   role: string
 }
 
-interface NavLink {
+interface NavLinkItemType {
   label: string
   href: string
 }
@@ -22,19 +22,19 @@ interface NavbarState {
   isOpen: boolean
 }
 
-const NAV_LINKS: NavLink[] = [
+const NAV_LINKS: NavLinkItemType[] = [
   { label: 'Pages', href: '#pages' },
   { label: 'Components', href: '#components' },
   { label: 'Support', href: '#support' },
 ]
 
-interface SVGProps {
-  'aria-hidden': boolean
-  className?: string
+interface SVGIconProps extends React.SVGProps<SVGSVGElement> {
+  'aria-hidden': boolean;
+  className?: string;
 }
 
-const SVGHamburger: FC<SVGProps> = ({ 'aria-hidden': ariaHidden, className }) => (
-  <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden={ariaHidden} className={className}>
+const SVGHamburger = ({ 'aria-hidden': ariaHidden, className, ...props }: React.SVGProps<SVGSVGElement> & { 'aria-hidden': boolean }) => (
+  <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden={ariaHidden} className={className} {...props}>
     <path
       d="M3 6h18M3 12h18M3 18h18"
       fill="none"
@@ -45,27 +45,27 @@ const SVGHamburger: FC<SVGProps> = ({ 'aria-hidden': ariaHidden, className }) =>
   </svg>
 )
 
-const SVGLogout: FC<SVGProps> = ({ 'aria-hidden': ariaHidden, className }) => (
-  <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden={ariaHidden} className={className} fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-    <polyline points="16 17 21 12 16 7" />
-    <line x1="21" y1="12" x2="9" y2="12" />
-  </svg>
-)
+function SVGLogout({ 'aria-hidden': ariaHidden, className }: SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden={ariaHidden} className={className} fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <polyline points="16 17 21 12 16 7" />
+      <line x1="21" y1="12" x2="9" y2="12" />
+    </svg>
+  )
+}
 
-const NavLink: FC<{ href: string; label: string; onClose: () => void }> = ({
-  href,
-  label,
-  onClose,
-}) => (
-  <li role="none">
-    <a role="menuitem" href={href} className="link" onClick={onClose}>
-      {label}
-    </a>
-  </li>
-)
+function NavLinkItem({ href, label, onClose }: { href: string; label: string; onClose: () => void }) {
+  return (
+    <li role="none">
+      <a role="menuitem" href={href} className="link" onClick={onClose}>
+        {label}
+      </a>
+    </li>
+  );
+}
 
-export const Navbar: FC<NavbarProps> = ({ onGithubClick }) => {
+export function Navbar({ onGithubClick }: NavbarProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
@@ -151,7 +151,7 @@ export const Navbar: FC<NavbarProps> = ({ onGithubClick }) => {
           role="menubar"
         >
           {NAV_LINKS.map((link) => (
-            <NavLink
+            <NavLinkItem
               key={link.href}
               href={link.href}
               label={link.label}

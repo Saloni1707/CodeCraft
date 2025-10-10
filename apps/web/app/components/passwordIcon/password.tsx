@@ -1,5 +1,6 @@
 'use client'
-import React, { useState, FC } from 'react'
+
+import { useState } from 'react'
 import './password.css'
 
 interface PasswordInputProps {
@@ -9,16 +10,18 @@ interface PasswordInputProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   placeholder?: string
   required?: boolean
+  className?: string
 }
 
-const PasswordInput: FC<PasswordInputProps> = ({
+export default function PasswordInput({
   id = 'password',
   label = 'Password',
   value,
   onChange,
   placeholder = 'Enter your password',
   required = false,
-}) => {
+  className = ''
+}: PasswordInputProps) {
   const [showPassword, setShowPassword] = useState(false)
 
   return (
@@ -74,4 +77,3 @@ const PasswordInput: FC<PasswordInputProps> = ({
   )
 }
 
-export default PasswordInput

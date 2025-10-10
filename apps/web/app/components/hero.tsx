@@ -13,11 +13,10 @@ export function Hero(){
                 <br className="hidden md:block"/>
                 that feel real, not boilerplate
             </h1>
-            <div className="mt-6 flex items-center justify-center gap-4">
+            <div className="mt-8 flex items-center justify-center">
                 <Link
                     href="/signup"
-                    className="btn-neu btn-shine btn-lg bg-primary text-primary-foreground"
-                    aria-label="Signup"
+                    className="px-8 py-4 text-xl font-semibold rounded-full bg-black text-white hover:bg-gray-800 transition-all duration-300 shadow-md hover:shadow-lg active:scale-95"
                 >
                     GET STARTED
                 </Link>

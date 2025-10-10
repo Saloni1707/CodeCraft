@@ -39,7 +39,22 @@
   --sidebar-ring: oklch(0.708 0 0);
   /* Grid pattern sizing and color use neutrals from theme */
   --grid-size: 28px;
-  --grid-line: oklch(0.9 0 0 / 0.55); /* light neutral line */
+  --grid-line: oklch(0.9 0 0 / 0.55);
+  
+  /* Neumorphic shadows for light mode */
+  --neu-shadow-light: rgba(255, 255, 255, 0.8);
+  --neu-shadow-dark: rgba(163, 177, 198, 0.6);
+  
+  /* Neumorphic elevation (raised effect) */
+  --neu-elevation: 9px 9px 16px var(--neu-shadow-dark), -9px -9px 16px var(--neu-shadow-light);
+  
+  /* Neumorphic inset (pressed effect) */
+  --neu-inset-rest: inset 2px 2px 5px var(--neu-shadow-dark), inset -2px -2px 5px var(--neu-shadow-light);
+  
+  --neu-inset-focus: inset 3px 3px 7px var(--neu-shadow-dark), inset -3px -3px 7px var(--neu-shadow-light);
+  
+  /* Border radius */
+  --neu-radius: 16px;
 }
 
 .dark {
@@ -75,6 +90,10 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
+  
+  /* Neumorphic shadows for dark mode */
+  --neu-shadow-light: rgba(255, 255, 255, 0.05);
+  --neu-shadow-dark: rgba(0, 0, 0, 0.5);
 }
 
 @theme inline {
@@ -145,7 +164,6 @@
     );
   background-size: var(--grid-size) var(--grid-size), var(--grid-size) var(--grid-size);
   mask-image: radial-gradient(120% 120% at 50% 40%, black 60%, transparent 100%);
-  /* keep theme background visible beneath */
   mix-blend-mode: normal;
   opacity: 0.9;
 }
