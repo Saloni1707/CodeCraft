@@ -44,7 +44,8 @@
   
   .form-group label {
     font-size: 0.875rem;
-    color: var(--color-muted-foreground);
+    font-weight: 400;
+    color:#000 ;
   }
   
   .form-group input {
@@ -53,7 +54,8 @@
     border: 2px solid transparent;
     border-radius: calc(var(--neu-radius) - 6px);
     background: var(--color-card);
-    color: var(--color-foreground);
+    /* color: var(--color-foreground); */
+    color: #000;
     padding: 0 0.875rem;
     box-shadow: var(--neu-inset-rest);
     transition: box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
