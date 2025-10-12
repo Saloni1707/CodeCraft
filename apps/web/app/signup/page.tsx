@@ -30,7 +30,11 @@ export default function SignupPage(){
                 setError(data.message || 'Signup failed')
                 return
             }
-            router.push('/dashboard')
+            if(data.token){
+                localStorage.setItem('tpk',data.token);
+            }
+            window.location.href = '/dashboard';
+            //router.push('/dashboard')
         }catch(err){
             setError('An error occured during signup')
             console.error(err)
