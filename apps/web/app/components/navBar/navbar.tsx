@@ -23,8 +23,8 @@ interface NavbarState {
 }
 
 const NAV_LINKS: NavLinkItemType[] = [
-  { label: 'Pages', href: '#pages' },
-  { label: 'Components', href: '#components' },
+  { label: 'Dashboard', href: '/dashboard' },
+  { label: 'Admin', href: '/admin/dashboard' },
   { label: 'Support', href: '#support' },
 ]
 
@@ -150,14 +150,20 @@ export function Navbar({ onGithubClick }: NavbarProps) {
           className={`links ${isOpen ? 'open' : ''}`}
           role="menubar"
         >
-          {NAV_LINKS.map((link) => (
-            <NavLinkItem
-              key={link.href}
-              href={link.href}
-              label={link.label}
-              onClose={handleLinkClose}
-            />
-          ))}
+          {NAV_LINKS.map((link) => {
+            // Only show admin link to admin users
+            if (link.href.startsWith('/admin') && user?.role !== 'admin') {
+              return null;
+            }
+            return (
+              <NavLinkItem
+                key={link.href}
+                href={link.href}
+                label={link.label}
+                onClose={handleLinkClose}
+              />
+            );
+          })}
         </ul>
 
         <div className="cta">
