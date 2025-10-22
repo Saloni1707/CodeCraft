@@ -1,3 +1,4 @@
+"use client"
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
@@ -36,25 +37,29 @@ const buttonVariants = cva(
   }
 )
 
-function Button({
-  className,
-  variant,
-  size,
-  asChild = false,
-  ...props
-}: React.ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean
-  }) {
+export interface ButtonProps 
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
+}
+
+const ButtonComponent = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, type = "button", ...props }, ref) => {
   const Comp = asChild ? Slot : "button"
 
   return (
     <Comp
+      ref={ref}
+      type={asChild ? undefined : type}
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
-      {...props}
+      {...(props as any)}
     />
   )
-}
+})
 
-export { Button, buttonVariants }
+ButtonComponent.displayName = "Button"
+
+export const Button = ButtonComponent as (props: ButtonProps & {ref?:React.Ref<HTMLButtonElement>}) => React.ReactElement
+
+export { buttonVariants }

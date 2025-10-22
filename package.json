@@ -1,5 +1,5 @@
 {
-  "name": "CodeCrafter",
+  "name": "CodeCraft",
   "private": true,
   "scripts": {
     "build": "turbo run build",

@@ -18,23 +18,36 @@ export default function SignupPage(){
         setError('');
         setLoading(true)
         try{
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/signup`,{
-                method:'POST',
-                headers:{
-                    'Content-Type':'application/json',
+            console.log('Sending signup request to:', `${process.env.NEXT_PUBLIC_API_URL}/user/signup`);
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/signup`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
                 },
-                body:JSON.stringify({email,username,password}),
-            })
-            const data = await response.json()
-            if(!response.ok){
-                setError(data.message || 'Signup failed')
-                return
+                body: JSON.stringify({ email, username, password }),
+                credentials: 'include' // Important for cookies
+            });
+            
+            const data = await response.json();
+            console.log('Signup response:', { status: response.status, data });
+            
+            if (!response.ok) {
+                setError(data.message || 'Signup failed');
+                return;
             }
-            if(data.token){
-                localStorage.setItem('tpk',data.token);
+            
+            // Check if token is in the response data or in the response headers
+            const token = data.token || data.data?.token;
+            
+            if (token) {
+                // Set the auth token in a cookie that will expire in 7 days
+                document.cookie = `auth-token=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax; Secure`;
+                // window.location.href = '/dashboard';
+            } else {
+                console.error('No token in response:', data);
+                throw new Error('No authentication token received from server. Please check the server response.');
             }
-            window.location.href = '/dashboard';
-            //router.push('/dashboard')
+            router.push('/dashboard')
         }catch(err){
             setError('An error occured during signup')
             console.error(err)

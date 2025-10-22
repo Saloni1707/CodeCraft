@@ -61,14 +61,36 @@ router.post("/signup", async(req, res) => {
             data:{
                 email,
                 password:hashedPassword,
-                username
+                username,
+                role:'User'
             }
         });
-        return res.status(201).json({success:true,message:"User created successfully",user})
+        const token=await generateToken({id:user.id,role:user.role});
+        res.cookie('auth-token',token,{
+            httpOnly:true,
+            secure:true,
+            sameSite:'lax',
+            maxAge:7*24*60*60*1000,
+            path:'/'
+        })
+        return res.status(201).json({
+            success:true,
+            message:"User created successfully",
+            token,
+            user:{
+                id:user.id,
+                email:user.email,
+                username:user.username,
+                role:user.role
+            }
+        })
         }
     }catch(error){
         if(error instanceof z.ZodError){
-            return res.status(400).json({success:false,errors:error.errors})
+            return res.status(400).json({
+                success:false,
+                errors:error.errors
+            });
         }
         console.error(error);
         return res.status(500).json({success:false,message:"Internal server error"})
@@ -92,14 +114,29 @@ router.post("/signin",async (req, res) => {
             return res.status(400).json({success:false,message:"Invalid credentials"})
         }
         const token=await generateToken({id:user.id,role:user.role});
-        return res.status(200).json({success:true,message:"User signed in successfully",user:{id:user.id,email:user.email,role:user.role},token})
+        res.cookie('auth-token',token,{
+            httpOnly:true,
+            secure:true,
+            sameSite:true,
+            maxAge:7*24*60*60*1000,
+            path:'/'
+        })
+        return res.status(200).json({
+            success:true,
+            message:"User signed in successfully",
+            user:{id:user.id,email:user.email,role:user.role},
+            token
+        })
 
     }catch(error){
         if(error instanceof z.ZodError){
             return res.status(400).json({success:false,errors:error.errors})
         }
         console.error(error);
-        return res.status(500).json({success:false,message:"Internal server error"})
+        return res.status(500).json({
+            success:false,
+            message:"Internal server error"
+        })
     }
 });
 

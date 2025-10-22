@@ -1,5 +1,7 @@
-import { Button } from "@/components/ui/button";
+"use client"
+import { Button, type ButtonProps } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "./ui/card";
+import React from "react";
 
 export interface ChallengeCardProps {
   name: string;
@@ -34,7 +36,7 @@ export function ChallengeCard({ name, description }: ChallengeCardProps) {
         </p>
       </CardContent>
       <CardFooter>
-        <Button>Enter</Button>
+        <Button type="button" onClick={() => {}}>Enter</Button>
       </CardFooter>
     </Card>
   );

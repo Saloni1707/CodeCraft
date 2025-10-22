@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import express from "express";
 import userRouter from "./routes/user";
 import adminRouter from "./routes/admin";
@@ -14,7 +15,7 @@ app.use(cors({
     origin:"http://localhost:3000",
     credentials:true
 }))
-
+app.use(cookieParser());
 app.get("/health",(req,res) => {
     res.json({
         status:"OK",

@@ -13,6 +13,7 @@ const challenge:Challenge[]=[
         id:"Layout 101",
         name:"Layout 101",
         description:"Learn the basics of layout design"
+        
     },
     {
         id:"Layout 102",
@@ -46,6 +47,7 @@ export default function DashboardPage(){
                     ))}
                 </div>
             </section>
+            
         </main>
     )
 }
