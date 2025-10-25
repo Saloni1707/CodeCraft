@@ -62,6 +62,57 @@ router.get("/finished",async(req,res)=>{
     }
 });
 
+router.get("/challenges",async(req,res)=>{
+    try{
+        const challenges=await prisma.challenge.findMany({
+            include:{
+                contestToChallengeMapping:{
+                    include:{
+                        contests:true,
+                    }
+                }
+            }
+        });
+        return res.status(200).json({success:true,challenges});
+    }catch(err){
+        console.log(err);
+        return res.status(500).json({success:false,message:"Internal server error"});
+    }
+});
+
+router.get("/challenges/:challengeId",async(req,res)=>{
+    try{
+        const{challengeId}=req.params;
+        const challenge=await prisma.challenge.findUnique({
+            where:{id:challengeId},
+            include:{
+                contestToChallengeMapping:{
+                    include:{
+                        contests:true,
+                    }
+
+                }
+            }
+        });
+        if(!challenge){
+            return res.status(404).json({success:false,message:"Challenge not found"})
+        }
+        const now=new Date();
+        const contest = challenge.contestToChallengeMapping[0]?.contests;
+        if(!contest){
+            return res.status(404).json({success:false,message:"Contest not found"});
+        }
+        if(contest.startTime>now){
+            return res.status(404).json({success:false,message:"Contest not started yet"});
+        }
+        return res.status(200).json({success:true,challenge});
+    }catch(err){
+        console.log(err);
+        return res.status(500).json({success:false,message:"Internal server error"});
+    }
+});
+
+
 router.get("/:contestId",async(req,res)=>{
     try{
         const {contestId}=req.params;

@@ -8,7 +8,7 @@ const router=Router();
 
 router.post("/signup",async (req,res) =>{
     try{
-        const{email,password}=req.body;
+        const{username,email,password}=req.body;
         const existingUser=await prisma.user.findUnique({where:{email}});
         if(existingUser){
             return res.status(400).json({success:false,message:"User already exists"});
@@ -16,6 +16,7 @@ router.post("/signup",async (req,res) =>{
         const hashedPasswords = await hashPassword(password);
         const user = await prisma.user.create({
             data:{
+                username,
                 email,
                 password:hashedPasswords,
                 role:"Admin"
@@ -33,8 +34,15 @@ router.post("/signup",async (req,res) =>{
 
 router.post("/signin",async (req,res)=>{
     try{
-        const {email,password}=req.body;
-        const user=await prisma.user.findUnique({where:{email}});
+        const {username,password}=req.body;
+        const user=await prisma.user.findFirst({
+            where:{
+                OR: [
+                    { email: username },
+                    { username: username }
+                ]
+            }
+        });
         if(!user){
             return res.status(200).json({success:false,message:"Invalid Credentials"})
         }

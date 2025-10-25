@@ -16,6 +16,7 @@ interface User {
 interface NavLinkItemType {
   label: string
   href: string
+  adminOnly?: boolean
 }
 
 interface NavbarState {
@@ -24,7 +25,11 @@ interface NavbarState {
 
 const NAV_LINKS: NavLinkItemType[] = [
   { label: 'Dashboard', href: '/dashboard' },
-  { label: 'Admin', href: '/admin/dashboard' },
+  { 
+    label: 'Admin', 
+    href: '/admin/signin',
+    //adminOnly: true 
+  },
   { label: 'Support', href: '#support' },
 ]
 
@@ -152,9 +157,9 @@ export function Navbar({ onGithubClick }: NavbarProps) {
         >
           {NAV_LINKS.map((link) => {
             // Only show admin link to admin users
-            if (link.href.startsWith('/admin') && user?.role !== 'admin') {
-              return null;
-            }
+            // if (link.href.startsWith('/admin') && user?.role !== 'admin') {
+            //   return null;
+            // }
             return (
               <NavLinkItem
                 key={link.href}

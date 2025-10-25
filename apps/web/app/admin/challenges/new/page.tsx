@@ -42,6 +42,7 @@ export default function CreateChallenge() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
     
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
@@ -51,7 +52,13 @@ export default function CreateChallenge() {
         return;
       }
 
-      const response = await fetch(`/api/admin/contest/${formData.contestId}/challenge`, {
+      // Validate maxPoints
+      const points = Number(formData.maxPoints);
+      if (isNaN(points) || points < 1 || points > 1000) {
+        throw new Error('Points must be between 1 and 1000');
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/contest/${formData.contestId}/challenge`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -60,13 +67,14 @@ export default function CreateChallenge() {
         body: JSON.stringify({
           title: formData.title,
           notionDocId: formData.notionDocId,
-          maxPoints: Number(formData.maxPoints)
+          maxPoints: points
         })
       });
 
+      const responseData = await response.json();
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to create challenge');
+        throw new Error(responseData.message || 'Failed to create challenge');
       }
       
       // Show success message and redirect

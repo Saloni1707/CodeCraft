@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "./ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export interface ChallengeCardProps {
   id: string;
@@ -10,6 +11,7 @@ export interface ChallengeCardProps {
   description: string;
   maxPoints: number;
   contestId?: string;
+  className?: string;
 }
 
 export function ChallengeCard({ 
@@ -17,7 +19,8 @@ export function ChallengeCard({
   name, 
   description, 
   maxPoints,
-  contestId 
+  contestId,
+  className 
 }: ChallengeCardProps) {
   const router = useRouter();
 
@@ -27,18 +30,19 @@ export function ChallengeCard({
   };
 
   return (
-    <Card className="
-      border-2 border-gray-200 
-      hover:border-primary/50 
-      transition-all 
-      rounded-xl 
-      shadow-sm hover:shadow-md
-      flex flex-col 
-      w-full 
-      h-full
-      overflow-hidden
-      group
-    ">
+    <Card className={cn(
+      "border-2 border-gray-200 " +
+      "hover:border-primary/50 " +
+      "transition-all " +
+      "rounded-xl " +
+      "shadow-sm hover:shadow-md " +
+      "flex flex-col " +
+      "w-full " +
+      "h-full " +
+      "overflow-hidden " +
+      "group ",
+      className
+    )}>
       <div className="p-6 flex-1 flex flex-col">
         <CardHeader className="p-0 mb-4">
           <div className="flex justify-between items-start">
