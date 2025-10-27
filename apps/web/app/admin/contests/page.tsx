@@ -1,5 +1,4 @@
 'use client';
-
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,6 +39,9 @@ export default function ContestsPage() {
   }, []);
 
   const fetchContests = async () => {
+    setIsLoading(true);
+    setError(null);
+    
     try {
       const token = localStorage.getItem('authToken');
       if (!token) {
@@ -47,7 +49,7 @@ export default function ContestsPage() {
         return;
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/contests`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/contest/active`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
