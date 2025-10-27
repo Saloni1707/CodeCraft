@@ -97,7 +97,7 @@ router.post("/signup", async(req, res) => {
     }
 });
 const signinSchema=z.object({
-    email:z.string().email("Invalid email"),
+    //email:z.string().email("Invalid email"),
     password:z.string().min(4,"Password must be at least 4 characters"),
     username:z.string().min(4,"Username must be at least 4 characters")    
 })
@@ -177,6 +177,24 @@ router.post('/verify-otp', async (req, res) => {
             success: false, 
             message 
         });
+    }
+});
+
+router.get("/user/challenges",async(req,res)=>{
+    try{
+        const challenges=await prisma.challenge.findMany({
+            include:{
+                contestToChallengeMapping:{
+                    include:{
+                        contests:true,
+                    }
+                }
+            }
+        });
+        return res.status(200).json({success:true,challenges});
+    }catch(err){
+        console.log(err);
+        return res.status(500).json({success:false,message:"Internal server error"});
     }
 });
 

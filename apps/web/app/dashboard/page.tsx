@@ -28,13 +28,14 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchContests = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-        console.log('Fetching from:', `${apiUrl}/challenges`);
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+        console.log('Fetching from:', `${apiUrl}/contest/challenges`);
         
-        const response = await fetch(`${apiUrl}/challenges`, {
+        const response = await fetch(`${apiUrl}/contest/challenges`, {
           headers: {
             'Content-Type': 'application/json',
           },
+          cache: 'no-store',
         });
         
         if (!response.ok) {
@@ -46,8 +47,15 @@ export default function DashboardPage() {
         const data = await response.json();
         console.log('API Response:', data);
         
-        if (data.contests && Array.isArray(data.contests)) {
-          setContests(data.contests);
+        if (data.challenges && Array.isArray(data.challenges)) {
+          const singleContest: Contest = {
+            id:'all-challenges',
+            title:'Available Challenges',
+            startTime:new Date().toISOString(),
+            endTime:new Date().toISOString(),
+            challenges:data.challenges
+          }
+          setContests([singleContest]);
         } else {
           console.warn('Unexpected API response format:', data);
           setError('Received unexpected data format from server');
